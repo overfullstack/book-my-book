@@ -1,4 +1,4 @@
-package com.gakshintala.bookmybook.infrastructure.book;
+package com.gakshintala.bookmybook.infrastructure;
 
 import com.gakshintala.bookmybook.core.domain.book.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.book.Book;
@@ -47,10 +47,11 @@ class BookDatabaseRepository implements PersistBook, FindAvailableBook, FindBook
     }
 
     @Override
-    public void persist(Book book) {
+    public Book persist(Book book) {
         findBy(book.bookId())
                 .map(entity -> updateOptimistically(book))
                 .onEmpty(() -> insertNew(book));
+        return book;
     }
 
     private int updateOptimistically(Book book) {

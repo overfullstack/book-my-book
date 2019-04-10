@@ -17,7 +17,7 @@ public class CatalogueBookInstance {
     @NonNull
     BookType bookType;
 
-    static CatalogueBookInstance instanceOf(CatalogueBook catalogueBook, BookType bookType) {
+    public static CatalogueBookInstance instanceOf(CatalogueBook catalogueBook, BookType bookType) {
         return new CatalogueBookInstance(catalogueBook.getBookIsbn(), new BookId(UUID.randomUUID()), bookType);
 
     }

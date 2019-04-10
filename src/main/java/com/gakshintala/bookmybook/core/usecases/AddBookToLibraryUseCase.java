@@ -1,8 +1,8 @@
 package com.gakshintala.bookmybook.core.usecases;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
+import com.gakshintala.bookmybook.core.domain.book.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.common.Result;
-import com.gakshintala.bookmybook.core.ports.catalogue.PersistCatalogueBook;
+import com.gakshintala.bookmybook.core.ports.PersistBook;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -12,14 +12,14 @@ import static com.gakshintala.bookmybook.core.domain.common.Result.Success;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookToCatalogueUseCase implements UseCase<AddBookToCatalogueUseCase.InputValues, AddBookToCatalogueUseCase.OutputValues> {
-    private final PersistCatalogueBook persistCatalogueBook;
-    
+public class AddBookToLibraryUseCase implements UseCase<AddBookToLibraryUseCase.InputValues, AddBookToLibraryUseCase.OutputValues> {
+    private final PersistBook persistBook;
+
     @Override
     public OutputValues execute(InputValues input) {
         return new OutputValues(
                 Try.of(() -> {
-                    persistCatalogueBook.persistBook(input.getCatalogueBook());
+                    persistBook.persist(input.getAvailableBook());
                     return Success;
                 })
         );
@@ -27,7 +27,7 @@ public class AddBookToCatalogueUseCase implements UseCase<AddBookToCatalogueUseC
 
     @Value
     public static class InputValues implements UseCase.InputValues {
-        private final CatalogueBook catalogueBook;
+        private final AvailableBook availableBook;
     }
 
     @Value

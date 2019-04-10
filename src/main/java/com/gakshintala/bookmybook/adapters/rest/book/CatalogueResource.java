@@ -13,8 +13,13 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping("/catalogue")
 public interface CatalogueResource {
-    @PostMapping("/addToCatalogue")
-    CompletableFuture<ResponseEntity<ApiResponse>> addBookToCatalogue(
-            @Valid @RequestBody AddBookRequest request, HttpServletRequest httpServletRequest);
 
+    @PostMapping("/add-book")
+    CompletableFuture<ResponseEntity<ApiResponse>> addBookToCatalogue(
+            @Valid @RequestBody AddBookRequest addBookRequest, HttpServletRequest httpServletRequest);
+
+    @PostMapping("/add-book-instance")
+    CompletableFuture<CatalogueBookResponse> addBookInstanceToCatalogue(
+            @Valid @RequestBody AddBookInstanceRequest addBookInstanceRequest, HttpServletRequest httpServletRequest);
+    
 }

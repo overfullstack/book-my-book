@@ -1,4 +1,4 @@
-package com.gakshintala.bookmybook.infrastructure.book;
+package com.gakshintala.bookmybook.infrastructure;
 
 
 import com.gakshintala.bookmybook.core.domain.book.AvailableBook;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.UUID;
 
-import static com.gakshintala.bookmybook.infrastructure.book.BookDatabaseEntity.BookState.*;
+import static com.gakshintala.bookmybook.infrastructure.BookDatabaseEntity.BookState.*;
 import static io.vavr.API.*;
 
 @NoArgsConstructor
