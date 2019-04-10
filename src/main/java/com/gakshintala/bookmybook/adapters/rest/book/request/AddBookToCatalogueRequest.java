@@ -1,4 +1,4 @@
-package com.gakshintala.bookmybook.adapters.rest.book;
+package com.gakshintala.bookmybook.adapters.rest.book.request;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
 import com.gakshintala.bookmybook.core.usecases.AddBookToCatalogueUseCase;
@@ -7,7 +7,7 @@ import lombok.Value;
 import javax.validation.constraints.NotBlank;
 
 @Value
-public class AddBookRequest {
+public class AddBookToCatalogueRequest {
     @NotBlank
     private final String bookIsbn;
     @NotBlank

@@ -1,4 +1,4 @@
-package com.gakshintala.bookmybook.adapters.rest.book;
+package com.gakshintala.bookmybook.adapters.rest.book.response;
 
 import com.gakshintala.bookmybook.core.domain.common.Result;
 import io.vavr.control.Try;

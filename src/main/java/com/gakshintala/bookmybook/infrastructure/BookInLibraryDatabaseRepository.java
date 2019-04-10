@@ -11,7 +11,7 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.ports.FindAvailableBook;
 import com.gakshintala.bookmybook.core.ports.FindBook;
 import com.gakshintala.bookmybook.core.ports.FindBookOnHold;
-import com.gakshintala.bookmybook.core.ports.PersistBook;
+import com.gakshintala.bookmybook.core.ports.PersistBookInLibrary;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ import static io.vavr.control.Option.of;
 
 @AllArgsConstructor
 @Repository
-class BookDatabaseRepository implements PersistBook, FindAvailableBook, FindBookOnHold, FindBook {
+class BookInLibraryDatabaseRepository implements PersistBookInLibrary, FindAvailableBook, FindBookOnHold, FindBook {
 
     private final JdbcTemplate jdbcTemplate;
 
