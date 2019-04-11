@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.adapters.rest.book;
 
-import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookEverywhereRequest;
+import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookEverywhereCommand;
 import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookToLibraryRequest;
 import com.gakshintala.bookmybook.adapters.rest.book.response.LibraryBookResponse;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,5 +22,5 @@ public interface LibraryResource {
 
     @PostMapping("/add-book-everywhere")
     CompletableFuture<LibraryBookResponse> addBookEverywhere(
-            @Valid @RequestBody AddBookEverywhereRequest addBookEverywhereRequest, HttpServletRequest httpServletRequest);
+            @Valid @RequestBody AddBookEverywhereCommand addBookEverywhereCommand, HttpServletRequest httpServletRequest);
 }

@@ -10,23 +10,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookToLibrary implements UseCase<AddBookToLibrary.InputValues, AddBookToLibrary.OutputValues> {
+public class AddBookToLibrary implements UseCase<AddBookToLibrary.InputValues, Try<Book>> {
     private final PersistBookInLibrary persistBookInLibrary;
 
     @Override
-    public OutputValues execute(InputValues input) {
-        return new OutputValues(
-                Try.of(() -> persistBookInLibrary.persist(input.getAvailableBook()))
-        );
+    public Try<Book> execute(InputValues input) {
+        return Try.of(() -> persistBookInLibrary.persist(input.getAvailableBook()));
     }
 
     @Value
     public static class InputValues implements UseCase.InputValues {
         private final AvailableBook availableBook;
     }
-
-    @Value
-    public static class OutputValues implements UseCase.OutputValues {
-        private final Try<Book> book;
-    }
+    
 }

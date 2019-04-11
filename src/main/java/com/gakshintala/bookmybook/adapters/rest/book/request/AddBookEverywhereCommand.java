@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Value
-public class AddBookEverywhereRequest {
+public class AddBookEverywhereCommand {
     @NotNull
     AddBookToCatalogueRequest bookInfo;
     @NotBlank

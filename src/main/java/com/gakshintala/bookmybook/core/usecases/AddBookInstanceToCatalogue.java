@@ -12,29 +12,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookInstanceToCatalogue implements UseCase<AddBookInstanceToCatalogue.InputValues, AddBookInstanceToCatalogue.OutputValues> {
+public class AddBookInstanceToCatalogue implements UseCase<AddBookInstanceToCatalogue.InputValues, Try<CatalogueBookInstance>> {
     private final FindCatalogueBook findCatalogueBook;
     private final PersistCatalogueBookInstance persistCatalogueBookInstance;
 
     @Override
-    public OutputValues execute(InputValues input) {
-        return new OutputValues(
-                Try.of(() -> findCatalogueBook
-                        .findBy(new ISBN(input.getIsbn().getIsbn()))
-                        .map(book -> CatalogueBookInstance.instanceOf(book, input.getBookType()))
-                        .map(persistCatalogueBookInstance::persistBookInstance)
-                        .get()) // TODO: 2019-04-10 Someway to represent different errors for findCatalogBook not found and db exception with persistBook 
-        );
+    public Try<CatalogueBookInstance> execute(InputValues input) {
+        return Try.of(() -> findCatalogueBook.findBy(new ISBN(input.getIsbn().getIsbn()))
+                .map(book -> CatalogueBookInstance.instanceOf(book, input.getBookType()))
+                .map(persistCatalogueBookInstance::persistBookInstance)
+                .get()); // TODO: 2019-04-10 Someway to represent different errors for findCatalogBook not found and db exception with persistBook 
+
     }
 
     @Value
     public static class InputValues implements UseCase.InputValues {
         private final ISBN isbn;
         private final BookType bookType;
-    }
-
-    @Value
-    public static class OutputValues implements UseCase.OutputValues {
-        private final Try<CatalogueBookInstance> catalogueBookInstance;
     }
 }

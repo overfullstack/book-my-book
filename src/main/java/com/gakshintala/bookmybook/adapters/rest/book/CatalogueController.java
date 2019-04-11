@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.adapters.rest.book;
 
-import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookInstanceToCatalogueRequest;
+import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookInstanceToCatalogueCommand;
 import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookToCatalogueRequest;
 import com.gakshintala.bookmybook.adapters.rest.book.response.ApiResponse;
 import com.gakshintala.bookmybook.adapters.rest.book.response.CatalogueBookResponse;
@@ -28,17 +28,17 @@ public class CatalogueController implements CatalogueResource {
         return useCaseExecutor.execute(
                 addBookToCatalogue,
                 addBookToCatalogueRequest.toInput(),
-                outputValues -> ApiResponse.fromResult(outputValues.getResult())
+                ApiResponse::fromResult
         );
     }
 
     @Override
-    public CompletableFuture<CatalogueBookResponse> addBookInstanceToCatalogue(@Valid AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest,
+    public CompletableFuture<CatalogueBookResponse> addBookInstanceToCatalogue(@Valid AddBookInstanceToCatalogueCommand addBookInstanceToCatalogueCommand,
                                                                                HttpServletRequest httpServletRequest) {
         return useCaseExecutor.execute(
                 addBookInstanceToCatalogue,
-                addBookInstanceToCatalogueRequest.toInput(),
-                outputValues -> CatalogueBookResponse.fromResult(outputValues.getCatalogueBookInstance())
+                addBookInstanceToCatalogueCommand.toInput(),
+                CatalogueBookResponse::fromResult
         );
     }
 }

@@ -8,7 +8,7 @@ import lombok.Value;
 import javax.validation.constraints.NotBlank;
 
 @Value
-public class AddBookInstanceToCatalogueRequest {
+public class AddBookInstanceToCatalogueCommand {
     @NotBlank
     private final String isbn;
     @NotBlank

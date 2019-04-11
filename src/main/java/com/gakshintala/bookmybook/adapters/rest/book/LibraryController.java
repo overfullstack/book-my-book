@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.adapters.rest.book;
 
-import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookEverywhereRequest;
+import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookEverywhereCommand;
 import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookToLibraryRequest;
 import com.gakshintala.bookmybook.adapters.rest.book.response.LibraryBookResponse;
 import com.gakshintala.bookmybook.core.usecases.AddBookEverywhere;
@@ -26,16 +26,16 @@ public class LibraryController implements LibraryResource{
         return useCaseExecutor.execute(
                 addBookToLibrary,
                 addBookToLibraryRequest.toInput(),
-                outputValues -> LibraryBookResponse.fromResult(outputValues.getBook())
+                LibraryBookResponse::fromResult
         );
     }
 
     @Override
-    public CompletableFuture<LibraryBookResponse> addBookEverywhere(@Valid AddBookEverywhereRequest addBookEverywhereRequest, HttpServletRequest httpServletRequest) {
+    public CompletableFuture<LibraryBookResponse> addBookEverywhere(@Valid AddBookEverywhereCommand addBookEverywhereCommand, HttpServletRequest httpServletRequest) {
         return useCaseExecutor.execute(
                 addBookEverywhere,
-                addBookEverywhereRequest.toInput(),
-                outputValues -> LibraryBookResponse.fromResult(outputValues.getBook())
+                addBookEverywhereCommand.toInput(),
+                LibraryBookResponse::fromResult
         );
     }
 }

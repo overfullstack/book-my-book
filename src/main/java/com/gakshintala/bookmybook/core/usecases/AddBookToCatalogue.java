@@ -12,26 +12,20 @@ import static com.gakshintala.bookmybook.core.domain.common.Result.Success;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookToCatalogue implements UseCase<AddBookToCatalogue.InputValues, AddBookToCatalogue.OutputValues> {
+public class AddBookToCatalogue implements UseCase<AddBookToCatalogue.InputValues, Try<Result>> {
     private final PersistCatalogueBook persistCatalogueBook;
-    
+
     @Override
-    public OutputValues execute(InputValues input) {
-        return new OutputValues(
-                Try.of(() -> {
-                    persistCatalogueBook.persistBook(input.getCatalogueBook());
-                    return Success;
-                })
-        );
+    public Try<Result> execute(InputValues input) {
+        return Try.of(() -> {
+            persistCatalogueBook.persistBook(input.getCatalogueBook());
+            return Success;
+        });
     }
 
     @Value
     public static class InputValues implements UseCase.InputValues {
         private final CatalogueBook catalogueBook;
     }
-
-    @Value
-    public static class OutputValues implements UseCase.OutputValues {
-        private final Try<Result> result;
-    }
+    
 }
