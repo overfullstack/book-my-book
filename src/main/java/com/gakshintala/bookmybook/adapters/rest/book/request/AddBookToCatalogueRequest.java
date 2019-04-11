@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.adapters.rest.book.request;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
-import com.gakshintala.bookmybook.core.usecases.AddBookToCatalogueUseCase;
+import com.gakshintala.bookmybook.core.usecases.AddBookToCatalogue;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
@@ -15,8 +15,8 @@ public class AddBookToCatalogueRequest {
     @NotBlank
     private final String author;
 
-    public AddBookToCatalogueUseCase.InputValues toInput() {
-        return new AddBookToCatalogueUseCase.InputValues(
+    public AddBookToCatalogue.InputValues toInput() {
+        return new AddBookToCatalogue.InputValues(
                 new CatalogueBook(
                         this.getBookIsbn(),
                         this.getTitle(),

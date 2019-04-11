@@ -4,8 +4,8 @@ import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookInstanceToCa
 import com.gakshintala.bookmybook.adapters.rest.book.request.AddBookToCatalogueRequest;
 import com.gakshintala.bookmybook.adapters.rest.book.response.ApiResponse;
 import com.gakshintala.bookmybook.adapters.rest.book.response.CatalogueBookResponse;
-import com.gakshintala.bookmybook.core.usecases.AddBookInstanceToCatalogueUseCase;
-import com.gakshintala.bookmybook.core.usecases.AddBookToCatalogueUseCase;
+import com.gakshintala.bookmybook.core.usecases.AddBookInstanceToCatalogue;
+import com.gakshintala.bookmybook.core.usecases.AddBookToCatalogue;
 import com.gakshintala.bookmybook.core.usecases.UseCaseExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +19,14 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class CatalogueController implements CatalogueResource {
     private final UseCaseExecutor useCaseExecutor;
-    private final AddBookToCatalogueUseCase addBookToCatalogueUseCase;
-    private final AddBookInstanceToCatalogueUseCase addBookInstanceToCatalogueUseCase;
+    private final AddBookToCatalogue addBookToCatalogue;
+    private final AddBookInstanceToCatalogue addBookInstanceToCatalogue;
 
     @Override
     public CompletableFuture<ResponseEntity<ApiResponse>> addBookToCatalogue(@Valid AddBookToCatalogueRequest addBookToCatalogueRequest,
                                                                              HttpServletRequest httpServletRequest) {
         return useCaseExecutor.execute(
-                addBookToCatalogueUseCase,
+                addBookToCatalogue,
                 addBookToCatalogueRequest.toInput(),
                 outputValues -> ApiResponse.fromResult(outputValues.getResult())
         );
@@ -36,7 +36,7 @@ public class CatalogueController implements CatalogueResource {
     public CompletableFuture<CatalogueBookResponse> addBookInstanceToCatalogue(@Valid AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest,
                                                                                HttpServletRequest httpServletRequest) {
         return useCaseExecutor.execute(
-                addBookInstanceToCatalogueUseCase,
+                addBookInstanceToCatalogue,
                 addBookInstanceToCatalogueRequest.toInput(),
                 outputValues -> CatalogueBookResponse.fromResult(outputValues.getCatalogueBookInstance())
         );

@@ -2,7 +2,7 @@ package com.gakshintala.bookmybook.adapters.rest.book.request;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import com.gakshintala.bookmybook.core.domain.catalogue.ISBN;
-import com.gakshintala.bookmybook.core.usecases.AddBookInstanceToCatalogueUseCase;
+import com.gakshintala.bookmybook.core.usecases.AddBookInstanceToCatalogue;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
@@ -14,8 +14,8 @@ public class AddBookInstanceToCatalogueRequest {
     @NotBlank
     private final String bookType;
 
-    public AddBookInstanceToCatalogueUseCase.InputValues toInput() {
-        return new AddBookInstanceToCatalogueUseCase.InputValues(
+    public AddBookInstanceToCatalogue.InputValues toInput() {
+        return new AddBookInstanceToCatalogue.InputValues(
                 new ISBN(isbn), BookType.fromString(bookType)
         );
     }

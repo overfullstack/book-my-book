@@ -12,7 +12,7 @@ import static com.gakshintala.bookmybook.core.domain.common.Result.Success;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookToCatalogueUseCase implements UseCase<AddBookToCatalogueUseCase.InputValues, AddBookToCatalogueUseCase.OutputValues> {
+public class AddBookToCatalogue implements UseCase<AddBookToCatalogue.InputValues, AddBookToCatalogue.OutputValues> {
     private final PersistCatalogueBook persistCatalogueBook;
     
     @Override

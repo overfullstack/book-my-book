@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookToLibraryUseCase implements UseCase<AddBookToLibraryUseCase.InputValues, AddBookToLibraryUseCase.OutputValues> {
+public class AddBookToLibrary implements UseCase<AddBookToLibrary.InputValues, AddBookToLibrary.OutputValues> {
     private final PersistBookInLibrary persistBookInLibrary;
 
     @Override

@@ -9,4 +9,8 @@ import java.util.UUID;
 public class LibraryBranchId {
 
     @NonNull UUID libraryBranchId;
+
+    public static LibraryBranchId randomLibraryId() {
+        return new LibraryBranchId(UUID.randomUUID());
+    }
 }

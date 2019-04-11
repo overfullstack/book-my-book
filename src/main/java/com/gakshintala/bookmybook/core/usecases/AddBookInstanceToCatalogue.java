@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookInstanceToCatalogueUseCase implements UseCase<AddBookInstanceToCatalogueUseCase.InputValues, AddBookInstanceToCatalogueUseCase.OutputValues> {
+public class AddBookInstanceToCatalogue implements UseCase<AddBookInstanceToCatalogue.InputValues, AddBookInstanceToCatalogue.OutputValues> {
     private final FindCatalogueBook findCatalogueBook;
     private final PersistCatalogueBookInstance persistCatalogueBookInstance;
 
