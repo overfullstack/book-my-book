@@ -8,4 +8,8 @@ import java.util.UUID;
 @Value
 public class PatronId {
     @NonNull UUID patronId;
+
+    public static PatronId anyPatronId() {
+        return new PatronId(UUID.randomUUID());
+    }
 }

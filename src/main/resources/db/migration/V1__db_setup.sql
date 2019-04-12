@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS catalogue_book
 (
     id     INTEGER IDENTITY PRIMARY KEY,
-    isbn   VARCHAR(100) NOT NULL,
+    isbn   VARCHAR(100) NOT NULL UNIQUE,
     title  VARCHAR(100) NOT NULL,
     author VARCHAR(100) NOT NULL
 );
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS catalogue_book_instance
 (
     id      INTEGER IDENTITY PRIMARY KEY,
     isbn    VARCHAR(100) NOT NULL,
-    book_id UUID         NOT NULL
+    book_id UUID         NOT NULL UNIQUE
 );
 
 CREATE SEQUENCE catalogue_book_seq;
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS book_database_entity
 CREATE SEQUENCE book_database_entity_seq;
 
 
-CREATE TABLE IF NOT EXISTS patron_books_database_entity
+CREATE TABLE IF NOT EXISTS patron_database_entity
 (
     id          INTEGER IDENTITY PRIMARY KEY,
     patron_type VARCHAR(100) NOT NULL,
@@ -45,22 +45,23 @@ CREATE TABLE IF NOT EXISTS patron_books_database_entity
 
 CREATE TABLE IF NOT EXISTS hold_database_entity
 (
-    id                           INTEGER IDENTITY PRIMARY KEY,
-    book_id                      UUID      NOT NULL,
-    patron_id                    UUID      NOT NULL,
-    library_branch_id            UUID      NOT NULL,
-    patron_books_database_entity INTEGER   NOT NULL,
-    till                         TIMESTAMP NOT NULL
+    id                     INTEGER IDENTITY PRIMARY KEY,
+    book_id                UUID      NOT NULL,
+    patron_id              UUID      NOT NULL,
+    library_branch_id      UUID      NOT NULL,
+    patron_database_entity INTEGER   NOT NULL,
+    till                   TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS overdue_checkout_database_entity
 (
-    id                           INTEGER IDENTITY PRIMARY KEY,
-    book_id                      UUID    NOT NULL,
-    patron_id                    UUID    NOT NULL,
-    library_branch_id            UUID    NOT NULL,
-    patron_books_database_entity INTEGER NOT NULL
+    id                     INTEGER IDENTITY PRIMARY KEY,
+    book_id                UUID    NOT NULL,
+    patron_id              UUID    NOT NULL,
+    library_branch_id      UUID    NOT NULL,
+    patron_database_entity INTEGER NOT NULL
 );
+
 
 CREATE TABLE IF NOT EXISTS checkouts_sheet
 (

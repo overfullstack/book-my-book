@@ -1,30 +1,25 @@
 package com.gakshintala.bookmybook.core.usecases;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
-import com.gakshintala.bookmybook.core.domain.common.Result;
-import com.gakshintala.bookmybook.core.ports.catalogue.PersistCatalogueBook;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookId;
+import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistCatalogueBook;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.stereotype.Service;
 
-import static com.gakshintala.bookmybook.core.domain.common.Result.Success;
-
 @Service
 @RequiredArgsConstructor
-public class AddBookToCatalogue implements UseCase<AddBookToCatalogue.InputValues, Try<Result>> {
+public class AddBookToCatalogue implements UseCase<AddBookToCatalogue.AddBookToCatalogueCommand, Try<CatalogueBookId>> {
     private final PersistCatalogueBook persistCatalogueBook;
 
     @Override
-    public Try<Result> execute(InputValues input) {
-        return Try.of(() -> {
-            persistCatalogueBook.persistBook(input.getCatalogueBook());
-            return Success;
-        });
+    public Try<CatalogueBookId> execute(AddBookToCatalogueCommand command) {
+        return Try.of(() -> persistCatalogueBook.persistBook(command.getCatalogueBook()));
     }
 
     @Value
-    public static class InputValues implements UseCase.InputValues {
+    public static class AddBookToCatalogueCommand {
         private final CatalogueBook catalogueBook;
     }
     

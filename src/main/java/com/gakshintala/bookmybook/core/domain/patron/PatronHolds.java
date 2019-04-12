@@ -1,16 +1,16 @@
 package com.gakshintala.bookmybook.core.domain.patron;
 
-import com.gakshintala.bookmybook.core.domain.book.AvailableBook;
-import com.gakshintala.bookmybook.core.domain.book.BookOnHold;
+import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
+import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
 import lombok.NonNull;
 import lombok.Value;
 
 import java.util.Set;
 
 @Value
-class PatronHolds {
+public class PatronHolds {
 
-    static int MAX_NUMBER_OF_HOLDS = 5;
+    static final int MAX_NUMBER_OF_HOLDS = 5;
 
     Set<Hold> resourcesOnHold;
 

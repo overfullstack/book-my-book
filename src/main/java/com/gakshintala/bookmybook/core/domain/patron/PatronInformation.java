@@ -6,7 +6,7 @@ import lombok.Value;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronType.Regular;
 
 @Value
-class PatronInformation {
+public class PatronInformation {
 
     @NonNull PatronId patronId;
 
@@ -15,5 +15,6 @@ class PatronInformation {
     boolean isRegular() {
         return type.equals(Regular);
     }
+    
 }
 
