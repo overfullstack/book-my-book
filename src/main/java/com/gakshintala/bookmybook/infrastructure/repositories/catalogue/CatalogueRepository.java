@@ -24,11 +24,11 @@ import java.util.function.UnaryOperator;
 class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, FindCatalogueBook {
 
     private static final String INSERT_CATALOGUE_BOOK_SQL = "INSERT INTO catalogue_book (id, isbn, title, author) VALUES (catalogue_book_seq.nextval, ?, ?, ?)";
-    private static final String INSERT_BOOK_INSTANCE_SQL = "INSERT INTO catalogue_book_instance (id, isbn, book_id) VALUES (catalogue_book_instance_seq.nextval, ?, ?)";
+    private static final String INSERT_CATALOGUE_BOOK_INSTANCE_SQL = "INSERT INTO catalogue_book_instance (id, isbn, book_id) VALUES (catalogue_book_instance_seq.nextval, ?, ?)";
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public CatalogueBookId persistBook(CatalogueBook book) {
+    public CatalogueBookId persist(CatalogueBook book) {
         Function<JdbcTemplate, UnaryOperator<KeyHolder>> persistBook = jdbc -> keyHolder -> {
             jdbc.update(connection -> {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CATALOGUE_BOOK_SQL, Statement.RETURN_GENERATED_KEYS);
@@ -39,24 +39,24 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
             }, keyHolder);
             return keyHolder;
         };
-        return DBUtils.operateAndGetGeneratedKey(persistBook, jdbcTemplate)
+        return DBUtils.insertAndGetGeneratedKey(persistBook, jdbcTemplate)
                 .map(CatalogueBookId::new)
                 .get();
     }
 
     @Override
-    public CatalogueBookInstanceUUID persist(BookInstance bookInstance) {
+    public CatalogueBookInstanceUUID persist(CatalogueBookInstance catalogueBookInstance) {
         Function<JdbcTemplate, UnaryOperator<KeyHolder>> persistBookInstance = jdbc -> keyHolder -> {
             jdbc.update(connection -> {
-                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_BOOK_INSTANCE_SQL, Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setString(1, bookInstance.getBookIsbn().getIsbn());
-                preparedStatement.setObject(2, bookInstance.getCatalogueBookInstanceUUID().getBookInstanceUUID().toString());
+                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CATALOGUE_BOOK_INSTANCE_SQL, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setString(1, catalogueBookInstance.getBookIsbn().getIsbn());
+                preparedStatement.setObject(2, catalogueBookInstance.getCatalogueBookInstanceUUID().getBookInstanceUUID().toString());
                 return preparedStatement;
             }, keyHolder);
             return keyHolder;
         };
-        DBUtils.operateAndGetGeneratedKey(persistBookInstance, jdbcTemplate);
-        return bookInstance.getCatalogueBookInstanceUUID();
+        DBUtils.insertAndGetGeneratedKey(persistBookInstance, jdbcTemplate);
+        return catalogueBookInstance.getCatalogueBookInstanceUUID();
     }
 
     @Override
@@ -70,9 +70,7 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
             ).map(CatalogueBookDomainMapper::toDomainModel);
         } catch (EmptyResultDataAccessException e) {
             return Option.none();
-
         }
     }
-
 }
 

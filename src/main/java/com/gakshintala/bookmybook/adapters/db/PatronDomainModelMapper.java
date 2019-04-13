@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.adapters.db;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
-import com.gakshintala.bookmybook.core.domain.common.LibraryBranchId;
+import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.patron.*;
 import com.gakshintala.bookmybook.infrastructure.repositories.patron.OverdueCheckoutDatabaseEntity;
 import com.gakshintala.bookmybook.infrastructure.repositories.patron.PatronDatabaseEntity;

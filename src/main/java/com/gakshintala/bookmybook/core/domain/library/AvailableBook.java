@@ -3,7 +3,6 @@ package com.gakshintala.bookmybook.core.domain.library;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
-import com.gakshintala.bookmybook.core.domain.common.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.common.Version;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
@@ -21,13 +20,17 @@ public class AvailableBook implements Book {
     BookInformation bookInformation;
 
     @NonNull
-    LibraryBranchId libraryBranch;
+    LibraryBranchId libraryBranchId;
 
     @NonNull
     Version version;
 
     public AvailableBook(CatalogueBookInstanceUUID catalogueBookInstanceUUID, BookType type, LibraryBranchId libraryBranchId, Version version) {
         this(new BookInformation(catalogueBookInstanceUUID, type), libraryBranchId, version);
+    }
+
+    public CatalogueBookInstanceUUID getBookId() {
+        return bookInformation.getCatalogueBookInstanceUUID();
     }
 
     public boolean isRestricted() {

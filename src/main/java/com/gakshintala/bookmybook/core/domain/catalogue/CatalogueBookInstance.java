@@ -8,16 +8,14 @@ import java.util.UUID;
 
 @Value
 @AllArgsConstructor
-public class BookInstance {
+public class CatalogueBookInstance {
 
     @NonNull
     ISBN bookIsbn;
     @NonNull
     CatalogueBookInstanceUUID catalogueBookInstanceUUID;
-    @NonNull
-    BookType bookType;
 
-    public static BookInstance instanceOf(CatalogueBook catalogueBook, BookType bookType) {
-        return new BookInstance(catalogueBook.getBookIsbn(), new CatalogueBookInstanceUUID(UUID.randomUUID()), bookType);
+    public static CatalogueBookInstance instanceOf(CatalogueBook catalogueBook) {
+        return new CatalogueBookInstance(catalogueBook.getBookIsbn(), new CatalogueBookInstanceUUID(UUID.randomUUID()));
     }
 }

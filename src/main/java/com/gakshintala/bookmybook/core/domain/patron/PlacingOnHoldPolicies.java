@@ -17,7 +17,7 @@ public class PlacingOnHoldPolicies {
         return right(new Allowance());
     };
     private static final PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
-        if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
+        if (patron.overdueCheckoutsAt(toHold.getLibraryBranchId()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
             return left(Rejection.withReason("cannot place on hold when there are overdue checkouts"));
         }
         return right(new Allowance());

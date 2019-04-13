@@ -4,9 +4,11 @@ package com.gakshintala.bookmybook.infrastructure.repositories.patron;
 import com.gakshintala.bookmybook.adapters.db.PatronDomainModelMapper;
 import com.gakshintala.bookmybook.core.domain.common.DomainEvents;
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronInformation;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.FindPatron;
+import com.gakshintala.bookmybook.core.ports.repositories.patron.HandlePatronEvent;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.PersistPatron;
 import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
@@ -19,7 +21,7 @@ import java.util.UUID;
 
 @Repository
 @AllArgsConstructor
-class PatronRepository implements FindPatron, PersistPatron {
+class PatronRepository implements FindPatron, PersistPatron, HandlePatronEvent {
     private final PatronEntityRepository patronEntityRepository;
     private final DomainEvents domainEvents;
 
@@ -34,6 +36,14 @@ class PatronRepository implements FindPatron, PersistPatron {
     public Patron persist(PatronInformation patronInformation) {
         PatronDatabaseEntity entity = patronEntityRepository
                 .save(new PatronDatabaseEntity(patronInformation.getPatronId(), patronInformation.getType()));
+        return PatronDomainModelMapper.toDomainModel(entity);
+    }
+
+    @Override
+    public Patron handle(PatronEvent domainEvent) {
+        PatronDatabaseEntity entity = patronEntityRepository.findByPatronId(domainEvent.patronId().getPatronId());
+        entity = entity.handle(domainEvent);
+        entity = patronEntityRepository.save(entity);
         return PatronDomainModelMapper.toDomainModel(entity);
     }
 

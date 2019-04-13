@@ -15,7 +15,8 @@ public class BookDatabaseEntity {
     public enum BookState {
         Available, OnHold, Collected
     }
-
+    
+    int id;
     UUID book_id;
     BookType book_type;
     BookState book_state;

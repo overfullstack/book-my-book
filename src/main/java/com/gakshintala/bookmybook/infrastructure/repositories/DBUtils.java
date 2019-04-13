@@ -11,10 +11,14 @@ import java.util.function.UnaryOperator;
 
 @UtilityClass
 public class DBUtils {
-    public static Option<String> operateAndGetGeneratedKey(Function<JdbcTemplate, UnaryOperator<KeyHolder>> jdbcOperation, JdbcTemplate jdbcTemplate) {
+    public static Option<String> insertAndGetGeneratedKey(Function<JdbcTemplate, UnaryOperator<KeyHolder>> jdbcOperation, JdbcTemplate jdbcTemplate) {
         return Option.of(new GeneratedKeyHolder())
                 .map(jdbcOperation.apply(jdbcTemplate))
                 .map(KeyHolder::getKey)
                 .map(Number::toString);
+    }
+
+    public static int performUpdateOperation(Function<JdbcTemplate, Integer> jdbcOperation, JdbcTemplate jdbcTemplate) {
+        return jdbcOperation.apply(jdbcTemplate);
     }
 }

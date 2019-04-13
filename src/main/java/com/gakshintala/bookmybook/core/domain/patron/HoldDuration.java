@@ -48,6 +48,13 @@ public class HoldDuration {
         Instant till = from.plus(Duration.ofDays(days.getDays()));
         return new HoldDuration(from, till);
     }
+    
+    public static HoldDuration forNoOfDays(Integer noOfDays) {
+        return Option.of(noOfDays)
+                .map(NumberOfDays::of)
+                .map(HoldDuration::closeEnded)
+                .getOrElse(HoldDuration.openEnded());
+    }
 
 }
 

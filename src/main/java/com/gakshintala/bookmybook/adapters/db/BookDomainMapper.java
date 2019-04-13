@@ -1,15 +1,14 @@
 package com.gakshintala.bookmybook.adapters.db;
 
-import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
-import com.gakshintala.bookmybook.core.domain.library.Book;
-import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
-import com.gakshintala.bookmybook.core.domain.library.CollectedBook;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
-import com.gakshintala.bookmybook.core.domain.common.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.common.Version;
+import com.gakshintala.bookmybook.core.domain.library.*;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity;
+import com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState;
 import io.vavr.API;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import lombok.experimental.UtilityClass;
 
 import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.*;
@@ -18,12 +17,16 @@ import static io.vavr.API.Match;
 
 @UtilityClass
 public class BookDomainMapper {
-    public static Book toDomainModel(BookDatabaseEntity bookDatabaseEntity) {
-        return Match(bookDatabaseEntity.getBook_state()).of(
-                Case(API.$(Available), toAvailableBook(bookDatabaseEntity)),
-                Case(API.$(OnHold), toBookOnHold(bookDatabaseEntity)),
-                Case(API.$(Collected), toCollectedBook(bookDatabaseEntity))
-        );
+    public static Tuple2<Integer, Book> toDomainModel(BookDatabaseEntity bookDatabaseEntity) {
+        return toDomainModelWithState(bookDatabaseEntity, bookDatabaseEntity.getBook_state());
+    }
+
+    private static Tuple2<Integer, Book> toDomainModelWithState(BookDatabaseEntity bookDatabaseEntity, BookState bookState) {
+        return Tuple.of(bookDatabaseEntity.getId(), Match(bookState).of(
+                Case(API.$(Available), () -> toAvailableBook(bookDatabaseEntity)),
+                Case(API.$(OnHold), () -> toBookOnHold(bookDatabaseEntity)),
+                Case(API.$(Collected), () -> toCollectedBook(bookDatabaseEntity))
+        ));
     }
 
     private static AvailableBook toAvailableBook(BookDatabaseEntity bookDatabaseEntity) {
@@ -39,6 +42,7 @@ public class BookDomainMapper {
 
     private static CollectedBook toCollectedBook(BookDatabaseEntity bookDatabaseEntity) {
         return new CollectedBook(new CatalogueBookInstanceUUID(bookDatabaseEntity.getBook_id()), bookDatabaseEntity.getBook_type(),
-                new LibraryBranchId(bookDatabaseEntity.getCollected_at_branch()), new PatronId(bookDatabaseEntity.getCollected_by_patron()), new Version(bookDatabaseEntity.getVersion()));
+                new LibraryBranchId(bookDatabaseEntity.getCollected_at_branch()), new PatronId(bookDatabaseEntity.getCollected_by_patron()),
+                new Version(bookDatabaseEntity.getVersion()));
     }
 }

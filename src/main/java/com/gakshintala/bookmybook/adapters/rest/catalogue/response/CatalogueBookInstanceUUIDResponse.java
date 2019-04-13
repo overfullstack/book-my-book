@@ -1,10 +1,12 @@
 package com.gakshintala.bookmybook.adapters.rest.catalogue.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import io.vavr.control.Try;
 import lombok.Value;
 
 @Value
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CatalogueBookInstanceUUIDResponse {
     private final Boolean success;
     private final String message;

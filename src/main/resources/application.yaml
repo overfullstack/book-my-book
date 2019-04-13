@@ -19,6 +19,8 @@ logging:
 ---
 
 spring:
+  jackson:
+    default-property-inclusion: non_null
   profiles: test
   h2:
     console:

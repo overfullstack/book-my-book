@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.core.domain.patron;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
-import com.gakshintala.bookmybook.core.domain.common.LibraryBranchId;
+import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import lombok.NonNull;
 import lombok.Value;
 

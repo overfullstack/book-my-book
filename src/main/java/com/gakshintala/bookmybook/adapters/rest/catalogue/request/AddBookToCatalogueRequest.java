@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.adapters.rest.catalogue.request;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
-import com.gakshintala.bookmybook.core.usecases.AddBookToCatalogue.AddBookToCatalogueCommand;
+import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookToCatalogue.AddBookToCatalogueCommand;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;

@@ -29,7 +29,7 @@ public class CheckoutDuration {
         return forNoOfDays(now(), noOfDays);
     }
 
-    static CheckoutDuration forNoOfDays(Instant from, int noOfDays) {
+    private static CheckoutDuration forNoOfDays(Instant from, int noOfDays) {
         return new CheckoutDuration(from, of(noOfDays));
     }
 

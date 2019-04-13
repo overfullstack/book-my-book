@@ -3,7 +3,7 @@ package com.gakshintala.bookmybook.core.domain.patron;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import com.gakshintala.bookmybook.core.domain.common.DomainEvent;
-import com.gakshintala.bookmybook.core.domain.common.LibraryBranchId;
+import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lombok.NonNull;
@@ -57,7 +57,7 @@ public interface PatronEvent extends DomainEvent {
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
                     bookType,
-                    libraryBranchId.getLibraryBranchId(),
+                    libraryBranchId.getLibraryBranchUUID(),
                     holdDuration.getFrom(),
                     holdDuration.getTo().getOrNull());
         }
@@ -82,7 +82,8 @@ public interface PatronEvent extends DomainEvent {
         public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
             return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
         }
-
+        
+        @Override
         public List<DomainEvent> normalize() {
             return List.<DomainEvent>of(bookPlacedOnHold).appendAll(maximumNumberOhHoldsReached.toList());
         }
@@ -119,7 +120,7 @@ public interface PatronEvent extends DomainEvent {
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
                     bookType,
-                    libraryBranchId.getLibraryBranchId(),
+                    libraryBranchId.getLibraryBranchUUID(),
                     checkoutDuration.to());
         }
     }
@@ -143,13 +144,13 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchUUID());
         }
     }
 
@@ -162,13 +163,13 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookCollectingFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchUUID());
         }
     }
 
@@ -185,7 +186,7 @@ public interface PatronEvent extends DomainEvent {
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchUUID());
         }
     }
 
@@ -197,12 +198,12 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
+        public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookHoldCancelingFailed(
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchUUID());
         }
     }
 
@@ -219,7 +220,7 @@ public interface PatronEvent extends DomainEvent {
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchUUID());
         }
     }
 
@@ -236,7 +237,7 @@ public interface PatronEvent extends DomainEvent {
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchUUID());
         }
     }
 

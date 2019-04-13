@@ -5,5 +5,5 @@ import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookId;
 
 @FunctionalInterface
 public interface PersistCatalogueBook {
-    CatalogueBookId persistBook(CatalogueBook book);
+    CatalogueBookId persist(CatalogueBook book);
 }

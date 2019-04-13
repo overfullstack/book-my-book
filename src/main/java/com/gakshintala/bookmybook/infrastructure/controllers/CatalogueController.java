@@ -5,8 +5,8 @@ import com.gakshintala.bookmybook.adapters.rest.catalogue.request.AddBookToCatal
 import com.gakshintala.bookmybook.adapters.rest.catalogue.response.CatalogueBookInstanceUUIDResponse;
 import com.gakshintala.bookmybook.adapters.rest.catalogue.response.CatalogueBookIdResponse;
 import com.gakshintala.bookmybook.core.ports.controllers.CatalogueResource;
-import com.gakshintala.bookmybook.core.usecases.AddBookInstanceToCatalogue;
-import com.gakshintala.bookmybook.core.usecases.AddBookToCatalogue;
+import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookInstanceToCatalogue;
+import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookToCatalogue;
 import com.gakshintala.bookmybook.core.usecases.UseCaseExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;

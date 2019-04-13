@@ -3,13 +3,13 @@ package com.gakshintala.bookmybook.adapters.rest.library.request;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
-import com.gakshintala.bookmybook.core.domain.common.LibraryBranchId;
+import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.common.Version;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
 
-import static com.gakshintala.bookmybook.core.usecases.AddBookToLibrary.AddBookToLibraryCommand;
+import static com.gakshintala.bookmybook.core.usecases.library.AddBookToLibrary.AddBookToLibraryCommand;
 
 @Value
 public class AddBookToLibraryRequest {

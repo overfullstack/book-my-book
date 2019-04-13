@@ -12,4 +12,8 @@ public class PatronId {
     public static PatronId anyPatronId() {
         return new PatronId(UUID.randomUUID());
     }
+    
+    public static PatronId fromString(String patronIdStr) {
+        return new PatronId(UUID.fromString(patronIdStr));
+    }
 }

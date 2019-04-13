@@ -1,8 +1,11 @@
-package com.gakshintala.bookmybook.core.usecases;
+package com.gakshintala.bookmybook.core.usecases.catalogue;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.*;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstance;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.ISBN;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.FindCatalogueBook;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistBookInstance;
+import com.gakshintala.bookmybook.core.usecases.UseCase;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -16,16 +19,15 @@ public class AddBookInstanceToCatalogue implements UseCase<AddBookInstanceToCata
 
     @Override
     public Try<CatalogueBookInstanceUUID> execute(AddBookInstanceToCatalogueCommand command) {
-        return Try.of(() -> findCatalogueBook.findBy(command.getIsbn())
-                .map(book -> BookInstance.instanceOf(book, command.getBookType()))
-                .map(persistBookInstance::persist)
-                .get()); // TODO: 2019-04-10 Someway to represent different errors for findCatalogBook not found and db exception with persistBook 
-
+        return Try.of(() ->
+                findCatalogueBook.findBy(command.getIsbn())
+                        .map(CatalogueBookInstance::instanceOf)
+                        .map(persistBookInstance::persist)
+                        .getOrElseThrow(() -> new IllegalArgumentException("No Book found in Catalogue with ISBN: " + command.getIsbn())));
     }
 
     @Value
     public static class AddBookInstanceToCatalogueCommand {
         private final ISBN isbn;
-        private final BookType bookType;
     }
 }
