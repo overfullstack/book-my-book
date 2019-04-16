@@ -1,6 +1,5 @@
 package com.gakshintala.bookmybook.core.usecases.library;
 
-import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBookId;
 import com.gakshintala.bookmybook.core.ports.repositories.library.PersistBookInLibrary;
@@ -14,17 +13,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookToLibrary implements UseCase<AddBookToLibrary.AddBookToLibraryCommand, Try<Tuple2<LibraryBookId, LibraryBranchId>>> {
+public class AddBookToLibrary implements UseCase<AddBookToLibrary.AddBookToLibraryCommand, Try<Tuple2<LibraryBookId, AvailableBook>>> {
     private final PersistBookInLibrary persistBookInLibrary;
 
     @Override
-    public Try<Tuple2<LibraryBookId, LibraryBranchId>> execute(AddBookToLibraryCommand command) {
-        return Try.of(() -> Tuple.of(persistBookInLibrary.persist(command.getAvailableBook()), command.getAvailableBook().getLibraryBranchId()));
+    public Try<Tuple2<LibraryBookId, AvailableBook>> execute(AddBookToLibraryCommand command) {
+        return persistBookInLibrary.persist(command.getAvailableBook())
+                .map(libraryBookId -> Tuple.of(libraryBookId, command.getAvailableBook()));
     }
 
     @Value
     public static class AddBookToLibraryCommand {
         private final AvailableBook availableBook;
     }
-    
+
 }

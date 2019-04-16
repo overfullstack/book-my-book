@@ -1,17 +1,17 @@
-package com.gakshintala.bookmybook.core.usecases.library;
+package com.gakshintala.bookmybook.core.usecases.compound;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
-import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.common.Version;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBookId;
+import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
+import com.gakshintala.bookmybook.core.usecases.UseCase;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookInstanceToCatalogue;
-import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookInstanceToCatalogue.AddBookInstanceToCatalogueCommand;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookToCatalogue;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookToCatalogue.AddBookToCatalogueCommand;
+import com.gakshintala.bookmybook.core.usecases.library.AddBookToLibrary;
 import com.gakshintala.bookmybook.core.usecases.library.AddBookToLibrary.AddBookToLibraryCommand;
-import com.gakshintala.bookmybook.core.usecases.UseCase;
 import io.vavr.Tuple2;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
@@ -20,26 +20,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AddBookEverywhere implements UseCase<AddBookEverywhere.AddBookEverywhereCommand, Try<Tuple2<LibraryBookId, LibraryBranchId>>> {
+public class AddBookEverywhere implements UseCase<AddBookEverywhere.AddBookEverywhereCommand, Try<Tuple2<LibraryBookId, AvailableBook>>> {
     private final AddBookToCatalogue addBookToCatalogue;
     private final AddBookInstanceToCatalogue addBookInstanceToCatalogue;
     private final AddBookToLibrary addBookToLibrary;
 
-    public final Try<Tuple2<LibraryBookId, LibraryBranchId>> execute(AddBookEverywhereCommand command) {
+    public final Try<Tuple2<LibraryBookId, AvailableBook>> execute(AddBookEverywhereCommand command) {
         return addBookToCatalogue.execute(
                 new AddBookToCatalogueCommand(command.getCatalogueBook()))
-                .flatMap(ignore ->
-                        addBookInstanceToCatalogue.execute(
-                                new AddBookInstanceToCatalogueCommand(
-                                        command.getCatalogueBook().getBookIsbn())))
-                .flatMap(catalogueBookInstanceUUID ->
-                        addBookToLibrary.execute(
-                                new AddBookToLibraryCommand(
-                                        new AvailableBook(
-                                                catalogueBookInstanceUUID,
-                                                command.getBookType(),
-                                                LibraryBranchId.randomLibraryId(),
-                                                Version.zero()))));
+                .flatMap(tuple2 -> addBookInstanceToCatalogue.persistBookInstance(tuple2._2))
+                .flatMap(catalogueBookInstanceUUID -> addBookToLibrary.execute(
+                        new AddBookToLibraryCommand(new AvailableBook(catalogueBookInstanceUUID, command.getBookType(),
+                                LibraryBranchId.randomLibraryId(), Version.zero()))));
     }
 
     @Value

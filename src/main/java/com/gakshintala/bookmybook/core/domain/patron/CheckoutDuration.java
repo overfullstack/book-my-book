@@ -25,11 +25,11 @@ public class CheckoutDuration {
         this.from = from;
     }
 
-    public static CheckoutDuration forNoOfDays(int noOfDays) {
+    public static CheckoutDuration forNoOfDays(Integer noOfDays) {
         return forNoOfDays(now(), noOfDays);
     }
 
-    private static CheckoutDuration forNoOfDays(Instant from, int noOfDays) {
+    private static CheckoutDuration forNoOfDays(Instant from, Integer noOfDays) {
         return new CheckoutDuration(from, of(noOfDays));
     }
 

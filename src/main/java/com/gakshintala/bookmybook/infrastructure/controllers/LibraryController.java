@@ -1,10 +1,10 @@
 package com.gakshintala.bookmybook.infrastructure.controllers;
 
-import com.gakshintala.bookmybook.adapters.rest.library.request.AddBookEverywhereRequest;
+import com.gakshintala.bookmybook.adapters.rest.compound.request.AddBookEverywhereRequest;
 import com.gakshintala.bookmybook.adapters.rest.library.request.AddBookToLibraryRequest;
 import com.gakshintala.bookmybook.adapters.rest.library.response.AddBookToLibraryResponse;
 import com.gakshintala.bookmybook.core.ports.controllers.LibraryResource;
-import com.gakshintala.bookmybook.core.usecases.library.AddBookEverywhere;
+import com.gakshintala.bookmybook.core.usecases.compound.AddBookEverywhere;
 import com.gakshintala.bookmybook.core.usecases.library.AddBookToLibrary;
 import com.gakshintala.bookmybook.core.usecases.UseCaseExecutor;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +27,6 @@ public class LibraryController implements LibraryResource {
         return useCaseExecutor.execute(
                 addBookToLibrary,
                 addBookToLibraryRequest.toCommand(),
-                AddBookToLibraryResponse::fromResult
-        );
-    }
-
-    @Override
-    public CompletableFuture<AddBookToLibraryResponse> addBookEverywhere(@Valid AddBookEverywhereRequest addBookEverywhereRequest, HttpServletRequest httpServletRequest) {
-        return useCaseExecutor.execute(
-                addBookEverywhere,
-                addBookEverywhereRequest.toCommand(),
                 AddBookToLibraryResponse::fromResult
         );
     }

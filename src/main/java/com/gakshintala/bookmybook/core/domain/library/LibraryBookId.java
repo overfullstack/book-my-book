@@ -7,6 +7,6 @@ import lombok.Value;
 public class LibraryBookId {
 
     @NonNull
-    String libraryBookId;
+    Integer libraryBookId;
     
 }

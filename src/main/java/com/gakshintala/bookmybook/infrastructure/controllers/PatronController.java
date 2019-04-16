@@ -1,5 +1,6 @@
 package com.gakshintala.bookmybook.infrastructure.controllers;
 
+import com.gakshintala.bookmybook.adapters.rest.compound.request.PlaceBookOnHoldCompoundRequest;
 import com.gakshintala.bookmybook.adapters.rest.patron.request.CancelHoldRequest;
 import com.gakshintala.bookmybook.adapters.rest.patron.request.CollectBookOnHoldRequest;
 import com.gakshintala.bookmybook.adapters.rest.patron.request.CreatePatronRequest;
@@ -8,8 +9,9 @@ import com.gakshintala.bookmybook.adapters.rest.patron.response.PatronResponse;
 import com.gakshintala.bookmybook.adapters.rest.patron.response.PatronEventResponse;
 import com.gakshintala.bookmybook.core.ports.controllers.PatronResource;
 import com.gakshintala.bookmybook.core.usecases.*;
+import com.gakshintala.bookmybook.core.usecases.compound.PlaceBookOnHoldCompound;
 import com.gakshintala.bookmybook.core.usecases.patron.CreatePatron;
-import com.gakshintala.bookmybook.core.usecases.patron.PatronCancelHold;
+import com.gakshintala.bookmybook.core.usecases.patron.PatronCancelBookOnHold;
 import com.gakshintala.bookmybook.core.usecases.patron.PatronCollectBookOnHold;
 import com.gakshintala.bookmybook.core.usecases.patron.PatronPlaceBookOnHold;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,8 @@ public class PatronController implements PatronResource {
     private final CreatePatron createPatron;
     private final PatronPlaceBookOnHold patronPlaceBookOnHold;
     private final PatronCollectBookOnHold patronCollectBookOnHold;
-    private final PatronCancelHold patronCancelHold;
+    private final PatronCancelBookOnHold patronCancelBookOnHold;
+    private final PlaceBookOnHoldCompound placeBookOnHoldCompound;
 
     @Override
     public CompletableFuture<PatronResponse> createPatron(@Valid CreatePatronRequest createPatronRequest, HttpServletRequest httpServletRequest) {
@@ -58,8 +61,17 @@ public class PatronController implements PatronResource {
     @Override
     public CompletableFuture<PatronEventResponse> cancelOnHold(@Valid CancelHoldRequest cancelHoldRequest, HttpServletRequest httpServletRequest) {
         return useCaseExecutor.execute(
-                patronCancelHold,
+                patronCancelBookOnHold,
                 cancelHoldRequest.toCommand(),
+                PatronEventResponse::fromResult
+        );
+    }
+
+    @Override
+    public CompletableFuture<PatronEventResponse> placeOnHoldCompound(@Valid PlaceBookOnHoldCompoundRequest placeBookOnHoldCompoundRequest, HttpServletRequest httpServletRequest) {
+        return useCaseExecutor.execute(
+                placeBookOnHoldCompound,
+                placeBookOnHoldCompoundRequest.toCommand(),
                 PatronEventResponse::fromResult
         );
     }

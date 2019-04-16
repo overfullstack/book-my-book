@@ -63,12 +63,13 @@ public interface PatronEvent extends DomainEvent {
         }
     }
 
+    // TODO 2019-04-16 gakshintala: Rename this.
     @Value
     class BookPlacedOnHoldEvents implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull UUID patronId;
         @NonNull BookPlacedOnHold bookPlacedOnHold;
-        @NonNull Option<MaximumNumberOhHoldsReached> maximumNumberOhHoldsReached;
+        @NonNull Option<MaximumNumberOfHoldsReached> maximumNumberOfHoldsReached;
 
         @Override
         public Instant getWhen() {
@@ -79,25 +80,25 @@ public interface PatronEvent extends DomainEvent {
             return new BookPlacedOnHoldEvents(bookPlacedOnHold.getPatronId(), bookPlacedOnHold, Option.none());
         }
 
-        public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
-            return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
+        public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
+            return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOfHoldsReached));
         }
         
         @Override
         public List<DomainEvent> normalize() {
-            return List.<DomainEvent>of(bookPlacedOnHold).appendAll(maximumNumberOhHoldsReached.toList());
+            return List.<DomainEvent>of(bookPlacedOnHold).appendAll(maximumNumberOfHoldsReached.toList());
         }
     }
 
     @Value
-    class MaximumNumberOhHoldsReached implements PatronEvent {
+    class MaximumNumberOfHoldsReached implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
         int numberOfHolds;
 
-        public static MaximumNumberOhHoldsReached now(PatronInformation patronInformation, int numberOfHolds) {
-            return new MaximumNumberOhHoldsReached(
+        public static MaximumNumberOfHoldsReached now(PatronInformation patronInformation, int numberOfHolds) {
+            return new MaximumNumberOfHoldsReached(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     numberOfHolds);
@@ -142,15 +143,15 @@ public interface PatronEvent extends DomainEvent {
         @NonNull Instant when;
         @NonNull UUID patronId;
         @NonNull UUID bookId;
-        @NonNull UUID libraryBranchId;
+        UUID libraryBranchId;
 
-        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, UUID libraryBranchId, PatronId patronId) {
             return new BookHoldFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
-                    patronInformation.getPatronId().getPatronId(),
+                    patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchUUID());
+                    libraryBranchId);
         }
     }
 
@@ -161,13 +162,13 @@ public interface PatronEvent extends DomainEvent {
         @NonNull Instant when;
         @NonNull UUID patronId;
         @NonNull UUID bookId;
-        @NonNull UUID libraryBranchId;
+        UUID libraryBranchId;
 
-        public static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookCollectingFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
-                    patronInformation.getPatronId().getPatronId(),
+                    patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
                     libraryBranchId.getLibraryBranchUUID());
         }
@@ -196,17 +197,21 @@ public interface PatronEvent extends DomainEvent {
         @NonNull Instant when;
         @NonNull UUID patronId;
         @NonNull UUID bookId;
-        @NonNull UUID libraryBranchId;
+        UUID libraryBranchId;
+        @NonNull String reason;
 
-        public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
+        public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId, 
+                                                                     LibraryBranchId libraryBranchId, PatronId patronId,
+                                                                     String reason) {
             return new BookHoldCancelingFailed(
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchUUID());
+                    libraryBranchId.getLibraryBranchUUID(),
+                    reason);
         }
     }
-
+// TODO 2019-04-16 gakshintala: clear out these eventIds
     @Value
     class BookHoldExpired implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();

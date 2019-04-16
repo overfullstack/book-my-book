@@ -16,7 +16,7 @@ public class CreatePatron implements UseCase<CreatePatron.CreatePatronCommand, T
 
     @Override
     public Try<Patron> execute(CreatePatronCommand command) {
-        return Try.of(() -> persistPatron.persist(command.getPatronInformation()));
+        return persistPatron.persist(command.getPatronInformation());
     }
 
     @Value

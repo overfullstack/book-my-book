@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.infrastructure.repositories;
 
-import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lombok.experimental.UtilityClass;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,14 +11,15 @@ import java.util.function.UnaryOperator;
 
 @UtilityClass
 public class DBUtils {
-    public static Option<String> insertAndGetGeneratedKey(Function<JdbcTemplate, UnaryOperator<KeyHolder>> jdbcOperation, JdbcTemplate jdbcTemplate) {
-        return Option.of(new GeneratedKeyHolder())
+    public static Try<Integer> insertAndGetGeneratedKey(Function<JdbcTemplate, UnaryOperator<KeyHolder>> jdbcOperation,
+                                                        JdbcTemplate jdbcTemplate) {
+        return Try.of(GeneratedKeyHolder::new)
                 .map(jdbcOperation.apply(jdbcTemplate))
                 .map(KeyHolder::getKey)
-                .map(Number::toString);
+                .map(Number::intValue);
     }
 
-    public static int performUpdateOperation(Function<JdbcTemplate, Integer> jdbcOperation, JdbcTemplate jdbcTemplate) {
-        return jdbcOperation.apply(jdbcTemplate);
+    public static Try<Integer> performUpdateOperation(Function<JdbcTemplate, Integer> jdbcOperation, JdbcTemplate jdbcTemplate) {
+        return Try.of(() -> jdbcOperation.apply(jdbcTemplate));
     }
 }

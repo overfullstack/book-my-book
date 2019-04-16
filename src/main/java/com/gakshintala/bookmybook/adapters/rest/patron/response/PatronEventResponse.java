@@ -11,7 +11,9 @@ import io.vavr.Tuple3;
 import io.vavr.control.Try;
 import lombok.Value;
 
-import static io.vavr.API.*;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
 import static io.vavr.Predicates.instanceOf;
 
 @Value

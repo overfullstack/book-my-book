@@ -1,5 +1,6 @@
 package com.gakshintala.bookmybook.core.usecases.catalogue;
 
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstance;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.ISBN;
@@ -19,11 +20,12 @@ public class AddBookInstanceToCatalogue implements UseCase<AddBookInstanceToCata
 
     @Override
     public Try<CatalogueBookInstanceUUID> execute(AddBookInstanceToCatalogueCommand command) {
-        return Try.of(() ->
-                findCatalogueBook.findBy(command.getIsbn())
-                        .map(CatalogueBookInstance::instanceOf)
-                        .map(persistBookInstance::persist)
-                        .getOrElseThrow(() -> new IllegalArgumentException("No Book found in Catalogue with ISBN: " + command.getIsbn())));
+        return findCatalogueBook.findBy(command.getIsbn())
+                        .flatMap(this::persistBookInstance);
+    }
+    
+    public Try<CatalogueBookInstanceUUID> persistBookInstance(CatalogueBook catalogueBook) {
+        return persistBookInstance.persist(CatalogueBookInstance.instanceOf(catalogueBook));
     }
 
     @Value

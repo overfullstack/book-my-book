@@ -1,9 +1,9 @@
-package com.gakshintala.bookmybook.adapters.rest.library.request;
+package com.gakshintala.bookmybook.adapters.rest.compound.request;
 
 import com.gakshintala.bookmybook.adapters.rest.catalogue.request.AddBookToCatalogueRequest;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
-import com.gakshintala.bookmybook.core.usecases.library.AddBookEverywhere.AddBookEverywhereCommand;
+import com.gakshintala.bookmybook.core.usecases.compound.AddBookEverywhere.AddBookEverywhereCommand;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;

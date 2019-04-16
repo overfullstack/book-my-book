@@ -10,8 +10,7 @@ import javax.validation.constraints.NotBlank;
 
 @Value
 public class CreatePatronRequest {
-    @NotBlank
-    private final String patronType;
+    @NotBlank private final String patronType;
 
     public CreatePatronCommand toCommand() {
         return new CreatePatronCommand(

@@ -1,5 +1,6 @@
 package com.gakshintala.bookmybook.core.ports.controllers;
 
+import com.gakshintala.bookmybook.adapters.rest.compound.request.PlaceBookOnHoldCompoundRequest;
 import com.gakshintala.bookmybook.adapters.rest.patron.request.CancelHoldRequest;
 import com.gakshintala.bookmybook.adapters.rest.patron.request.CollectBookOnHoldRequest;
 import com.gakshintala.bookmybook.adapters.rest.patron.request.CreatePatronRequest;
@@ -34,5 +35,9 @@ public interface PatronResource {
     @PostMapping("/cancel")
     CompletableFuture<PatronEventResponse> cancelOnHold(
             @Valid @RequestBody CancelHoldRequest cancelHoldRequest, HttpServletRequest httpServletRequest);
+
+    @PostMapping("/compound-place-on-hold")
+    CompletableFuture<PatronEventResponse> placeOnHoldCompound(
+            @Valid @RequestBody PlaceBookOnHoldCompoundRequest placeBookOnHoldCompoundRequest, HttpServletRequest httpServletRequest);
     
 }

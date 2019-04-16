@@ -2,12 +2,13 @@ package com.gakshintala.bookmybook.core.usecases.patron;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
-import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.patron.HoldDuration;
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldFailed;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldEvents;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.MaximumNumberOfHoldsReached;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.domain.patron.Rejection;
 import com.gakshintala.bookmybook.core.ports.repositories.library.FindAvailableBook;
@@ -27,12 +28,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
-import static com.gakshintala.bookmybook.core.domain.common.EitherResult.failure;
-import static com.gakshintala.bookmybook.core.domain.common.EitherResult.success;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldFailed.bookHoldFailedNow;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold.bookPlacedOnHoldNow;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldEvents.events;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronHolds.MAX_NUMBER_OF_HOLDS;
+import static io.vavr.control.Either.left;
+import static io.vavr.control.Either.right;
 
 @Service
 @RequiredArgsConstructor
@@ -44,45 +45,48 @@ public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.Plac
 
     @Override
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> execute(@NonNull PlaceOnHoldCommand command) {
-        return Try.of(() -> {
-            AvailableBook availableBook = find(command.getCatalogueBookInstanceUUID());
-            Patron patron = find(command.getPatronId());
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> result = placeOnHold(patron, availableBook, command.getHoldDuration());
-            return result.isRight() 
-                    ? Tuple.of(result.get(), handlePatronEvent.handle(result.get()), handlePatronEventInLibrary.handle(result.get()))
-                    : Tuple.of(result.getLeft(), null, null);
-        });
-    }
-    
-    private AvailableBook find(CatalogueBookInstanceUUID id) {
-        return findAvailableBook
-                .findBy(id)
-                .getOrElseThrow(() -> new IllegalArgumentException("Cannot find available book with Id: " + id.getBookInstanceUUID()));
+        return findAvailableBook.findAvailableBook(command.getCatalogueBookInstanceUUID())
+                .map(availableBook -> findPatron.findBy(command.getPatronId())
+                        .map(patron -> placeOnHold(patron, availableBook, command.getHoldDuration()))
+                        .map(this::handleResult)
+                        .map(Try::get)
+                        .get());
     }
 
-    private Patron find(PatronId patronId) {
-        return findPatron
-                .findBy(patronId)
-                .getOrElseThrow(() -> new IllegalArgumentException("Patron with given Id does not exists: " + patronId.getPatronId()));
+    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> handleResult(Either<BookHoldFailed, BookPlacedOnHoldEvents> result) {
+        return result.map(bookPlacedOnHoldEvents -> Try.of(() ->
+                        Tuple.of((PatronEvent) bookPlacedOnHoldEvents,
+                                handlePatronEvent.handle(bookPlacedOnHoldEvents).get(),
+                                handlePatronEventInLibrary.handle(bookPlacedOnHoldEvents).get())))
+                .getOrElseGet(bookHoldFailed -> Try.success(Tuple.of(bookHoldFailed, null, null)));
     }
 
-    private Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(Patron patron, AvailableBook aBook, HoldDuration duration) {
-        Option<Rejection> rejection = patronCanHold(patron, aBook, duration);
-        if (rejection.isEmpty()) {
-            PatronEvent.BookPlacedOnHold bookPlacedOnHold = bookPlacedOnHoldNow(aBook.getBookInstanceId(), aBook.type(), 
-                    aBook.getLibraryBranchId(), patron.getPatronInformation().getPatronId(), duration);
-            if (patron.getPatronHolds().maximumHoldsAfterHolding()) {
-                return success(events(bookPlacedOnHold, PatronEvent.MaximumNumberOhHoldsReached.now(patron.getPatronInformation(), MAX_NUMBER_OF_HOLDS)));
-            }
-            return success(events(bookPlacedOnHold));
-        }
-        return failure(bookHoldFailedNow(rejection.get(), aBook.getBookInstanceId(), aBook.getLibraryBranchId(), patron.getPatronInformation()));
+    public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(Patron patron, AvailableBook aBook, HoldDuration duration) {
+        return patronCanHold(patron, aBook, duration)
+                .map(rejection -> getBookHoldFailed(patron, aBook, rejection))
+                .getOrElse(() -> getBookPlacedOnHoldEvents(patron, aBook, duration));
     }
 
-    private Option<Rejection> patronCanHold(Patron patron, AvailableBook aBook, HoldDuration forDuration) {
+    private Either<BookHoldFailed, BookPlacedOnHoldEvents> getBookHoldFailed(Patron patron, AvailableBook aBook, Rejection rejection) {
+        return left(bookHoldFailedNow(rejection, aBook.getBookInstanceId(), aBook.getLibraryBranchId().getLibraryBranchUUID(),
+                patron.getPatronInformation().getPatronId()));
+    }
+
+    private Either<BookHoldFailed, BookPlacedOnHoldEvents> getBookPlacedOnHoldEvents(Patron patron, AvailableBook aBook, HoldDuration duration) {
+        return patron.getPatronHolds().maximumHoldsAfterHolding()
+                ? right(events(getBookPlacedOnHold(patron, aBook, duration), MaximumNumberOfHoldsReached.now(patron.getPatronInformation(), MAX_NUMBER_OF_HOLDS)))
+                : right(events(getBookPlacedOnHold(patron, aBook, duration)));
+    }
+
+    private BookPlacedOnHold getBookPlacedOnHold(Patron patron, AvailableBook aBook, HoldDuration duration) {
+        return bookPlacedOnHoldNow(aBook.getBookInstanceId(), aBook.type(),
+                aBook.getLibraryBranchId(), patron.getPatronInformation().getPatronId(), duration);
+    }
+
+    private Option<Rejection> patronCanHold(Patron patron, AvailableBook availableBook, HoldDuration forDuration) {
         return patron.getPlacingOnHoldPolicies()
                 .toStream()
-                .map(policy -> policy.apply(aBook, patron, forDuration))
+                .map(policy -> policy.apply(availableBook, patron, forDuration))
                 .find(Either::isLeft)
                 .map(Either::getLeft);
     }
@@ -91,9 +95,8 @@ public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.Plac
     public static class PlaceOnHoldCommand {
         @NonNull Instant timestamp;
         @NonNull PatronId patronId;
-        @NonNull LibraryBranchId libraryBranchId;
         @NonNull CatalogueBookInstanceUUID catalogueBookInstanceUUID;
         @NonNull HoldDuration holdDuration;
     }
-    
+
 }

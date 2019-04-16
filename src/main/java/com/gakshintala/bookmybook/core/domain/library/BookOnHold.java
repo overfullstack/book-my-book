@@ -39,20 +39,20 @@ public class BookOnHold implements Book {
         this(new BookInformation(catalogueBookInstanceUUID, type), libraryBranchId, patronId, holdTill, version);
     }
 
-    public AvailableBook handle(BookReturned bookReturned) {
+    public AvailableBook mapFrom(BookReturned bookReturned) {
         return new AvailableBook(
                 bookInformation, new LibraryBranchId(bookReturned.getLibraryBranchId()),
                 version);
     }
 
-    public AvailableBook handle(BookHoldExpired bookHoldExpired) {
+    public AvailableBook mapFrom(BookHoldExpired bookHoldExpired) {
         return new AvailableBook(
                 bookInformation,
                 new LibraryBranchId(bookHoldExpired.getLibraryBranchId()),
                 version);
     }
 
-    public CollectedBook handle(BookCollected bookCollected) {
+    public CollectedBook mapFrom(BookCollected bookCollected) {
         return new CollectedBook(
                 bookInformation,
                 new LibraryBranchId(bookCollected.getLibraryBranchId()),
@@ -60,7 +60,7 @@ public class BookOnHold implements Book {
                 version);
     }
 
-    public AvailableBook handle(BookHoldCanceled bookHoldCanceled) {
+    public AvailableBook mapFrom(BookHoldCanceled bookHoldCanceled) {
         return new AvailableBook(
                 bookInformation, new LibraryBranchId(bookHoldCanceled.getLibraryBranchId()),
                 version);

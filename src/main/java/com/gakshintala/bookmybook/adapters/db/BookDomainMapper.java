@@ -17,12 +17,12 @@ import static io.vavr.API.Match;
 
 @UtilityClass
 public class BookDomainMapper {
-    public static Tuple2<Integer, Book> toDomainModel(BookDatabaseEntity bookDatabaseEntity) {
+    public static Tuple2<LibraryBookId, Book> toDomainModel(BookDatabaseEntity bookDatabaseEntity) {
         return toDomainModelWithState(bookDatabaseEntity, bookDatabaseEntity.getBook_state());
     }
 
-    private static Tuple2<Integer, Book> toDomainModelWithState(BookDatabaseEntity bookDatabaseEntity, BookState bookState) {
-        return Tuple.of(bookDatabaseEntity.getId(), Match(bookState).of(
+    private static Tuple2<LibraryBookId, Book> toDomainModelWithState(BookDatabaseEntity bookDatabaseEntity, BookState bookState) {
+        return Tuple.of(new LibraryBookId(bookDatabaseEntity.getId()), Match(bookState).of(
                 Case(API.$(Available), () -> toAvailableBook(bookDatabaseEntity)),
                 Case(API.$(OnHold), () -> toBookOnHold(bookDatabaseEntity)),
                 Case(API.$(Collected), () -> toCollectedBook(bookDatabaseEntity))

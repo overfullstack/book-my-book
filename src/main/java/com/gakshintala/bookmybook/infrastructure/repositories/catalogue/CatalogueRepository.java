@@ -1,14 +1,20 @@
 package com.gakshintala.bookmybook.infrastructure.repositories.catalogue;
 
 import com.gakshintala.bookmybook.adapters.db.CatalogueBookDomainMapper;
-import com.gakshintala.bookmybook.core.domain.catalogue.*;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookId;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstance;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.ISBN;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.FindCatalogueBook;
-import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistCatalogueBook;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistBookInstance;
+import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistCatalogueBook;
 import com.gakshintala.bookmybook.infrastructure.repositories.DBUtils;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.KeyHolder;
@@ -28,24 +34,23 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public CatalogueBookId persist(CatalogueBook book) {
+    public Try<Tuple2<CatalogueBookId, CatalogueBook>> persist(CatalogueBook catalogueBook) {
         Function<JdbcTemplate, UnaryOperator<KeyHolder>> persistBook = jdbc -> keyHolder -> {
             jdbc.update(connection -> {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CATALOGUE_BOOK_SQL, Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setString(1, book.getBookIsbn().getIsbn());
-                preparedStatement.setString(2, book.getTitle().getTitle());
-                preparedStatement.setString(3, book.getAuthor().getName());
+                preparedStatement.setString(1, catalogueBook.getBookIsbn().getIsbn());
+                preparedStatement.setString(2, catalogueBook.getTitle().getTitle());
+                preparedStatement.setString(3, catalogueBook.getAuthor().getName());
                 return preparedStatement;
             }, keyHolder);
             return keyHolder;
         };
         return DBUtils.insertAndGetGeneratedKey(persistBook, jdbcTemplate)
-                .map(CatalogueBookId::new)
-                .get();
+                .map(catalogueBookId -> Tuple.of(new CatalogueBookId(catalogueBookId), catalogueBook));
     }
 
     @Override
-    public CatalogueBookInstanceUUID persist(CatalogueBookInstance catalogueBookInstance) {
+    public Try<CatalogueBookInstanceUUID> persist(CatalogueBookInstance catalogueBookInstance) {
         Function<JdbcTemplate, UnaryOperator<KeyHolder>> persistBookInstance = jdbc -> keyHolder -> {
             jdbc.update(connection -> {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CATALOGUE_BOOK_INSTANCE_SQL, Statement.RETURN_GENERATED_KEYS);
@@ -55,22 +60,19 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
             }, keyHolder);
             return keyHolder;
         };
-        DBUtils.insertAndGetGeneratedKey(persistBookInstance, jdbcTemplate);
-        return catalogueBookInstance.getCatalogueBookInstanceUUID();
+        return DBUtils.insertAndGetGeneratedKey(persistBookInstance, jdbcTemplate)
+                .map(ignore -> catalogueBookInstance.getCatalogueBookInstanceUUID());
     }
 
     @Override
-    public Option<CatalogueBook> findBy(ISBN isbn) {
-        try {
-            return Option.of(
-                    jdbcTemplate.queryForObject(
-                            "SELECT b.* FROM catalogue_book b WHERE b.isbn = ?",
-                            new BeanPropertyRowMapper<>(CatalogueBookDatabaseEntity.class),
-                            isbn.getIsbn())
-            ).map(CatalogueBookDomainMapper::toDomainModel);
-        } catch (EmptyResultDataAccessException e) {
-            return Option.none();
-        }
+    public Try<CatalogueBook> findBy(ISBN isbn) {
+        return Try.of(() -> Option.of(
+                jdbcTemplate.queryForObject(
+                        "SELECT b.* FROM catalogue_book b WHERE b.isbn = ?",
+                        new BeanPropertyRowMapper<>(CatalogueBookDatabaseEntity.class),
+                        isbn.getIsbn()))
+                .map(CatalogueBookDomainMapper::toDomainModel)
+        .getOrElseThrow(() -> new IllegalArgumentException("No Book found with ISBN: " + isbn.getIsbn())));
     }
 }
 

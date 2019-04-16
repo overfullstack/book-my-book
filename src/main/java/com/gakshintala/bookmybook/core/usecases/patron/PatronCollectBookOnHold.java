@@ -19,8 +19,8 @@ import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,43 +33,37 @@ import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookColl
 import static com.gakshintala.bookmybook.core.domain.patron.Rejection.withReason;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.CollectBookCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>>> {
     private final FindBookOnHold findBookOnHold;
     private final FindPatron findPatron;
     private final HandlePatronEvent handlePatronEvent;
     private final HandlePatronEventInLibrary handlePatronEventInLibrary;
-    
+
     @Override
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> execute(@NonNull CollectBookCommand command) {
-        return Try.of(() -> {
-            BookOnHold bookOnHold = find(command.getCatalogueBookInstanceUUID(), command.getPatronId());
-            Patron patron = find(command.getPatronId());
-            Either<BookCollectingFailed, BookCollected> result = collect(patron, bookOnHold, command.getCheckoutDuration());
-            return result.isRight()
-                    ? Tuple.of(result.get(), handlePatronEvent.handle(result.get()), handlePatronEventInLibrary.handle(result.get()))
-                    : Tuple.of(result.getLeft(), null, null);
-        });
+        return findBookOnHold.findBookOnHold(command.getCatalogueBookInstanceUUID())
+                .map(bookOnHold -> findPatron.findBy(command.getPatronId())
+                        .map(patron -> collect(patron, bookOnHold, command.getCheckoutDuration()))
+                        .map(this::handleResult)
+                        .map(Try::get)
+                        .get());
     }
 
-    private BookOnHold find(CatalogueBookInstanceUUID id, PatronId patronId) {
-        return findBookOnHold.findBy(id, patronId)
-                .getOrElseThrow(() -> new IllegalArgumentException("Cannot find book on hold with Id: " + id.getBookInstanceUUID()));
-    }
-
-    private Patron find(PatronId patronId) {
-        return findPatron
-                .findBy(patronId)
-                .getOrElseThrow(() -> new IllegalArgumentException("Patron with given Id does not exists: " + patronId.getPatronId()));
+    private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> handleResult(Either<BookCollectingFailed, BookCollected> result) {
+        return result.map(bookCollected -> Try.of(() ->
+                Tuple.of((PatronEvent) bookCollected,
+                        handlePatronEvent.handle(bookCollected).get(),
+                        handlePatronEventInLibrary.handle(bookCollected).get())))
+                .getOrElseGet(bookCollectingFailed -> Try.success(Tuple.of(bookCollectingFailed, null, null)));
     }
 
     private Either<BookCollectingFailed, BookCollected> collect(Patron patron, BookOnHold book, CheckoutDuration duration) {
-        if (patron.getPatronHolds().a(book)) {
-            return success(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(), 
-                    patron.getPatronInformation().getPatronId(), duration));
-        }
-        return failure(bookCollectingFailedNow(withReason("library is not on hold by patronInformation"), 
-                book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation()));
+        return patron.getPatronHolds().a(book)
+                ? success(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(),
+                patron.getPatronInformation().getPatronId(), duration))
+                : failure(bookCollectingFailedNow(withReason("Patron doesn't hold this book to Collect"),
+                book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId()));
     }
 
     @Value

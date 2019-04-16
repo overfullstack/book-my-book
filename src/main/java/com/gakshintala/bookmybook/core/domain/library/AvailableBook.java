@@ -28,11 +28,7 @@ public class AvailableBook implements Book {
     public AvailableBook(CatalogueBookInstanceUUID catalogueBookInstanceUUID, BookType type, LibraryBranchId libraryBranchId, Version version) {
         this(new BookInformation(catalogueBookInstanceUUID, type), libraryBranchId, version);
     }
-
-    public CatalogueBookInstanceUUID getBookId() {
-        return bookInformation.getCatalogueBookInstanceUUID();
-    }
-
+    
     public boolean isRestricted() {
         return bookInformation.getBookType().equals(BookType.Restricted);
     }
