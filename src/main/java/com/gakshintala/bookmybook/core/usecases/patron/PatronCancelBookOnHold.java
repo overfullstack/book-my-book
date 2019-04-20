@@ -24,10 +24,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
-import static com.gakshintala.bookmybook.core.domain.common.EitherResult.failure;
-import static com.gakshintala.bookmybook.core.domain.common.EitherResult.success;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled.holdCanceledNow;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCancelingFailed.holdCancelingFailedNow;
+import static io.vavr.control.Either.left;
+import static io.vavr.control.Either.right;
 
 @Service
 @RequiredArgsConstructor
@@ -58,8 +58,8 @@ public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.Ca
 
     private Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold(Patron patron, BookOnHold book) {
         return patron.getPatronHolds().a(book)
-                ? success(holdCanceledNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId()))
-                : failure(holdCancelingFailedNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId(),
+                ? right(holdCanceledNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId()))
+                : left(holdCancelingFailedNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId(),
                 "Patron doesn't hold this book to Cancel"));
     }
 

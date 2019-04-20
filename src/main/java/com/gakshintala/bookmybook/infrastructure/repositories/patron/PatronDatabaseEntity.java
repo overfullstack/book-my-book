@@ -3,14 +3,14 @@ package com.gakshintala.bookmybook.infrastructure.repositories.patron;
 
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronType;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import org.springframework.data.annotation.Id;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -22,15 +22,14 @@ public class PatronDatabaseEntity {
     Long id;
     UUID patronId;
     PatronType patronType;
-    //TODO 2019-04-16 gakshintala: Make these collections immutable by using vavr HashSet
     Set<HoldDatabaseEntity> booksOnHold;
     Set<OverdueCheckoutDatabaseEntity> checkouts;
 
     PatronDatabaseEntity(PatronId patronId, PatronType patronType) {
         this.patronId = patronId.getPatronId();
         this.patronType = patronType;
-        this.booksOnHold = new HashSet<>();
-        this.checkouts = new HashSet<>();
+        this.booksOnHold = HashSet.empty();
+        this.checkouts = HashSet.empty();
     }
 }
 

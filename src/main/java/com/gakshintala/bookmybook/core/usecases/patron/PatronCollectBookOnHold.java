@@ -26,11 +26,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
-import static com.gakshintala.bookmybook.core.domain.common.EitherResult.failure;
-import static com.gakshintala.bookmybook.core.domain.common.EitherResult.success;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected.bookCollectedNow;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollectingFailed.bookCollectingFailedNow;
 import static com.gakshintala.bookmybook.core.domain.patron.Rejection.withReason;
+import static io.vavr.control.Either.left;
+import static io.vavr.control.Either.right;
 
 @Service
 @RequiredArgsConstructor
@@ -60,9 +60,9 @@ public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.
 
     private Either<BookCollectingFailed, BookCollected> collect(Patron patron, BookOnHold book, CheckoutDuration duration) {
         return patron.getPatronHolds().a(book)
-                ? success(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(),
+                ? right(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(),
                 patron.getPatronInformation().getPatronId(), duration))
-                : failure(bookCollectingFailedNow(withReason("Patron doesn't hold this book to Collect"),
+                : left(bookCollectingFailedNow(withReason("Patron doesn't hold this book to Collect"),
                 book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId()));
     }
 

@@ -4,7 +4,7 @@ import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
 import lombok.NonNull;
 import lombok.Value;
 
-import java.util.Set;
+import io.vavr.collection.Set;
 
 @Value
 public class PatronHolds {

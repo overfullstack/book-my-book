@@ -13,7 +13,6 @@ public class ISBN {
 
     public ISBN(String isbn) {
         if (!isbn.trim().matches(VERY_SIMPLE_ISBN_CHECK)) {
-            // TODO: 2019-04-09 Do something about these exceptions 
             throw new IllegalArgumentException("Wrong ISBN!");
         }
         this.isbn = isbn.trim();

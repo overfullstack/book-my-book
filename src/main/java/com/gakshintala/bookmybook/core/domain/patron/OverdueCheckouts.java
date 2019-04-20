@@ -2,13 +2,11 @@ package com.gakshintala.bookmybook.core.domain.patron;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Map;
+import io.vavr.collection.Set;
 import lombok.NonNull;
 import lombok.Value;
-
-import java.util.Map;
-import java.util.Set;
-
-import static java.util.Collections.emptySet;
 
 @Value
 public class OverdueCheckouts {
@@ -18,7 +16,7 @@ public class OverdueCheckouts {
     @NonNull Map<LibraryBranchId, Set<CatalogueBookInstanceUUID>> overdueCheckouts;
 
     int countAt(@NonNull LibraryBranchId libraryBranchId) {
-        return overdueCheckouts.getOrDefault(libraryBranchId, emptySet()).size();
+        return overdueCheckouts.getOrElse(libraryBranchId, HashSet.empty()).size();
     }
 
 }

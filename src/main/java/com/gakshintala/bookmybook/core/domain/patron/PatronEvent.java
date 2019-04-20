@@ -41,7 +41,7 @@ public interface PatronEvent extends DomainEvent {
     }
 
     @Value
-    class BookPlacedOnHold implements PatronEvent {
+    class BookPlacedOnHoldOnce implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -51,8 +51,9 @@ public interface PatronEvent extends DomainEvent {
         @NonNull Instant holdFrom;
         Instant holdTill;
 
-        public static BookPlacedOnHold bookPlacedOnHoldNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType, LibraryBranchId libraryBranchId, PatronId patronId, HoldDuration holdDuration) {
-            return new BookPlacedOnHold(
+        public static BookPlacedOnHoldOnce bookPlacedOnHoldNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType,
+                                                               LibraryBranchId libraryBranchId, PatronId patronId, HoldDuration holdDuration) {
+            return new BookPlacedOnHoldOnce(
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
@@ -63,30 +64,29 @@ public interface PatronEvent extends DomainEvent {
         }
     }
 
-    // TODO 2019-04-16 gakshintala: Rename this.
     @Value
-    class BookPlacedOnHoldEvents implements PatronEvent {
+    class BookPlacedOnHold implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull UUID patronId;
-        @NonNull BookPlacedOnHold bookPlacedOnHold;
+        @NonNull PatronEvent.BookPlacedOnHoldOnce bookPlacedOnHoldOnce;
         @NonNull Option<MaximumNumberOfHoldsReached> maximumNumberOfHoldsReached;
 
         @Override
         public Instant getWhen() {
-            return bookPlacedOnHold.when;
+            return bookPlacedOnHoldOnce.when;
         }
 
-        public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold) {
-            return new BookPlacedOnHoldEvents(bookPlacedOnHold.getPatronId(), bookPlacedOnHold, Option.none());
+        public static BookPlacedOnHold events(BookPlacedOnHoldOnce bookPlacedOnHoldOnce) {
+            return new BookPlacedOnHold(bookPlacedOnHoldOnce.getPatronId(), bookPlacedOnHoldOnce, Option.none());
         }
 
-        public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
-            return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOfHoldsReached));
+        public static BookPlacedOnHold events(BookPlacedOnHoldOnce bookPlacedOnHoldOnce, MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
+            return new BookPlacedOnHold(bookPlacedOnHoldOnce.patronId, bookPlacedOnHoldOnce, Option.of(maximumNumberOfHoldsReached));
         }
         
         @Override
         public List<DomainEvent> normalize() {
-            return List.<DomainEvent>of(bookPlacedOnHold).appendAll(maximumNumberOfHoldsReached.toList());
+            return List.<DomainEvent>of(bookPlacedOnHoldOnce).appendAll(maximumNumberOfHoldsReached.toList());
         }
     }
 
@@ -115,7 +115,8 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID libraryBranchId;
         @NonNull Instant till;
 
-        public static BookCollected bookCollectedNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
+        public static BookCollected bookCollectedNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType, 
+                                                     LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
             return new BookCollected(
                     Instant.now(),
                     patronId.getPatronId(),
@@ -145,7 +146,8 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID bookId;
         UUID libraryBranchId;
 
-        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, UUID libraryBranchId, PatronId patronId) {
+        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, 
+                                                       UUID libraryBranchId, PatronId patronId) {
             return new BookHoldFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
