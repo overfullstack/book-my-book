@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.fixtures;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
-import com.gakshintala.bookmybook.core.domain.common.Version;
+import com.gakshintala.bookmybook.core.domain.library.Version;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.BookInformation;
 import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
@@ -30,7 +30,7 @@ public class BookFixture {
         return new BookOnHold(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), Instant.now(), version0());
     }
 
-    public static AvailableBook circulatingAvailableBookAt(LibraryBranchId libraryBranchId) {
+    private static AvailableBook circulatingAvailableBookAt(LibraryBranchId libraryBranchId) {
         return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId, version0());
     }
 
@@ -42,7 +42,7 @@ public class BookFixture {
         return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId, version0());
     }
 
-    public static Version version0() {
+    private static Version version0() {
         return new Version(0);
     }
 

@@ -1,6 +1,5 @@
 package com.gakshintala.bookmybook.infrastructure.controllers;
 
-import com.gakshintala.bookmybook.adapters.rest.compound.request.AddBookEverywhereRequest;
 import com.gakshintala.bookmybook.adapters.rest.library.request.AddBookToLibraryRequest;
 import com.gakshintala.bookmybook.adapters.rest.library.response.AddBookToLibraryResponse;
 import com.gakshintala.bookmybook.core.ports.controllers.LibraryResource;

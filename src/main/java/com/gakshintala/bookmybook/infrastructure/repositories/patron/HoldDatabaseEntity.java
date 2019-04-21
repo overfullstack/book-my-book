@@ -1,7 +1,6 @@
 package com.gakshintala.bookmybook.infrastructure.repositories.patron;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 

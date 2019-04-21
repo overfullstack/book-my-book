@@ -32,11 +32,11 @@ public class HoldDuration {
         return openEnded(Instant.now());
     }
 
-    public static HoldDuration openEnded(Instant from) {
+    private static HoldDuration openEnded(Instant from) {
         return new HoldDuration(from, null);
     }
 
-    public static HoldDuration closeEnded(NumberOfDays days) {
+    private static HoldDuration closeEnded(NumberOfDays days) {
         return closeEnded(Instant.now(), days);
     }
 
@@ -44,7 +44,7 @@ public class HoldDuration {
         return closeEnded(Instant.now(), NumberOfDays.of(days));
     }
 
-    public static HoldDuration closeEnded(Instant from, NumberOfDays days) {
+    private static HoldDuration closeEnded(Instant from, NumberOfDays days) {
         Instant till = from.plus(Duration.ofDays(days.getDays()));
         return new HoldDuration(from, till);
     }

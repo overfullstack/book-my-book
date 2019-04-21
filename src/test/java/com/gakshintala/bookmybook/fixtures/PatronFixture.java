@@ -58,7 +58,7 @@ public class PatronFixture {
                 noHolds());
     }
 
-    public static Patron regularPatron(PatronId patronId) {
+    private static Patron regularPatron(PatronId patronId) {
         return new Patron(
                 patronInformation(patronId, Regular),
                 List.of(onlyResearcherPatronsCanHoldRestrictedBooksPolicy),
@@ -74,7 +74,7 @@ public class PatronFixture {
                 noHolds());
     }
 
-    static PatronInformation patronInformation(PatronId id, PatronType type) {
+    private static PatronInformation patronInformation(PatronId id, PatronType type) {
         return new PatronInformation(id, type);
     }
 
@@ -87,7 +87,7 @@ public class PatronFixture {
                 booksOnHold(numberOfHolds));
     }
 
-    static Patron regularPatronWith(Hold hold) {
+    private static Patron regularPatronWith(Hold hold) {
         PatronId patronId = anyPatronId();
         PatronHolds patronHolds = new PatronHolds(HashSet.of(hold));
         return new Patron(
@@ -110,7 +110,7 @@ public class PatronFixture {
         return new Hold(anyBookId(), anyBranch());
     }
 
-    static PatronHolds booksOnHold(int numberOfHolds) {
+    private static PatronHolds booksOnHold(int numberOfHolds) {
         return new PatronHolds(HashSet.ofAll(rangeClosed(1, numberOfHolds)
                 .mapToObj(i -> new Hold(anyBookId(), anyBranch()))));
     }
@@ -152,11 +152,11 @@ public class PatronFixture {
         return patronId(UUID.randomUUID());
     }
 
-    static PatronId patronId(UUID patronId) {
+    private static PatronId patronId(UUID patronId) {
         return new PatronId(patronId);
     }
 
-    static PatronHolds noHolds() {
+    private static PatronHolds noHolds() {
         return new PatronHolds(HashSet.empty());
     }
 

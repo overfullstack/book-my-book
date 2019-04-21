@@ -2,7 +2,7 @@ package com.gakshintala.bookmybook.core.usecases.compound;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
-import com.gakshintala.bookmybook.core.domain.common.Version;
+import com.gakshintala.bookmybook.core.domain.library.Version;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBookId;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
@@ -26,8 +26,7 @@ public class AddBookEverywhere implements UseCase<AddBookEverywhere.AddBookEvery
     private final AddBookToLibrary addBookToLibrary;
 
     public final Try<Tuple2<LibraryBookId, AvailableBook>> execute(AddBookEverywhereCommand command) {
-        return addBookToCatalogue.execute(
-                new AddBookToCatalogueCommand(command.getCatalogueBook()))
+        return addBookToCatalogue.execute(new AddBookToCatalogueCommand(command.getCatalogueBook()))
                 .flatMap(tuple2 -> addBookInstanceToCatalogue.persistBookInstance(tuple2._2))
                 .flatMap(catalogueBookInstanceUUID -> addBookToLibrary.execute(
                         new AddBookToLibraryCommand(new AvailableBook(catalogueBookInstanceUUID, command.getBookType(),

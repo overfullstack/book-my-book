@@ -45,29 +45,29 @@ interface PatronEntityRepository extends CrudRepository<PatronDatabaseEntity, Lo
 public class PatronRepository implements FindPatron, PersistPatron, HandlePatronEvent {
     private final PatronEntityRepository patronEntityRepository;
     
-    private Function2<PatronDatabaseEntity, BookPlacedOnHoldOnce, PatronDatabaseEntity> handleBookPlacedOnHold = (entity, event) -> {
+    private final Function2<PatronDatabaseEntity, BookPlacedOnHoldOnce, PatronDatabaseEntity> handleBookPlacedOnHold = (entity, event) -> {
         Set<HoldDatabaseEntity> booksOnHold = entity.booksOnHold;
         booksOnHold.add(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()));
         return entity.withBooksOnHold(booksOnHold);
     };
-    private Function2<PatronDatabaseEntity, BookPlacedOnHold, PatronDatabaseEntity> handleBookPlacedOnHoldEvents = (entity, placedOnHoldEvents) -> {
+    private final Function2<PatronDatabaseEntity, BookPlacedOnHold, PatronDatabaseEntity> handleBookPlacedOnHoldEvents = (entity, placedOnHoldEvents) -> {
         BookPlacedOnHoldOnce event = placedOnHoldEvents.getBookPlacedOnHoldOnce();
         return handleBookPlacedOnHold.apply(entity, event);
     };
-    private Function2<PatronDatabaseEntity, BookCollected, PatronDatabaseEntity> handleBookCollected =
+    private final Function2<PatronDatabaseEntity, BookCollected, PatronDatabaseEntity> handleBookCollected =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
-    private Function2<PatronDatabaseEntity, BookHoldCanceled, PatronDatabaseEntity> handleBookHoldCanceled =
+    private final Function2<PatronDatabaseEntity, BookHoldCanceled, PatronDatabaseEntity> handleBookHoldCanceled =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
-    private Function2<PatronDatabaseEntity, BookHoldExpired, PatronDatabaseEntity> handleBookHoldExpired =
+    private final Function2<PatronDatabaseEntity, BookHoldExpired, PatronDatabaseEntity> handleBookHoldExpired =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
-    private Function2<PatronDatabaseEntity, OverdueCheckoutRegistered, PatronDatabaseEntity> handleOverdueCheckoutRegistered = (entity, event) -> {
+    private final Function2<PatronDatabaseEntity, OverdueCheckoutRegistered, PatronDatabaseEntity> handleOverdueCheckoutRegistered = (entity, event) -> {
         Set<OverdueCheckoutDatabaseEntity> checkouts = entity.checkouts;
         checkouts.add(new OverdueCheckoutDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId()));
         return entity.withCheckouts(checkouts);
     };
-    private Function2<PatronDatabaseEntity, BookReturned, PatronDatabaseEntity> handleBookReturned =
+    private final Function2<PatronDatabaseEntity, BookReturned, PatronDatabaseEntity> handleBookReturned =
             (entity, event) -> removeOverdueCheckoutIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
-    private Function2<PatronEvent, PatronDatabaseEntity, PatronDatabaseEntity> handle =
+    private final Function2<PatronEvent, PatronDatabaseEntity, PatronDatabaseEntity> handle =
             (event, entity) -> API.Match(event).of(
                     Case($(instanceOf(BookPlacedOnHold.class)), handleBookPlacedOnHoldEvents.curried().apply(entity)),
                     Case($(instanceOf(BookPlacedOnHoldOnce.class)), handleBookPlacedOnHold.curried().apply(entity)),

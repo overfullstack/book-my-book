@@ -2,7 +2,6 @@ package com.gakshintala.bookmybook.core.domain.library;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
-import com.gakshintala.bookmybook.core.domain.common.Version;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;

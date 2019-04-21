@@ -4,7 +4,7 @@ import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
-import com.gakshintala.bookmybook.core.domain.common.Version;
+import com.gakshintala.bookmybook.core.domain.library.Version;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;

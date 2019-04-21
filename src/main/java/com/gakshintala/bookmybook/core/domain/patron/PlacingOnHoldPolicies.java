@@ -28,7 +28,7 @@ public class PlacingOnHoldPolicies {
         }
         return right(new Allowance());
     };
-    public static final PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
+    private static final PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
         if (patron.isRegular() && holdDuration.isOpenEnded()) {
             return left(Rejection.withReason("regular patron cannot place open ended holds"));
         }

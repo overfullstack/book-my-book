@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class CatalogueBookInstanceId {
+class CatalogueBookInstanceId {
 
     @NonNull
     String catalogueBookInstanceId;

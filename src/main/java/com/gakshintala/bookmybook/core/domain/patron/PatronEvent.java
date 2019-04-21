@@ -1,10 +1,8 @@
 package com.gakshintala.bookmybook.core.domain.patron;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
-import com.gakshintala.bookmybook.core.domain.common.DomainEvent;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
-import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lombok.NonNull;
 import lombok.Value;
@@ -12,7 +10,7 @@ import lombok.Value;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface PatronEvent extends DomainEvent {
+public interface PatronEvent {
 
     default PatronId patronId() {
         return new PatronId(getPatronId());
@@ -23,10 +21,7 @@ public interface PatronEvent extends DomainEvent {
     default UUID getAggregateId() {
         return getPatronId();
     }
-
-    default List<DomainEvent> normalize() {
-        return List.of(this);
-    }
+    
 
     @Value
     class PatronCreated implements PatronEvent {
@@ -71,11 +66,6 @@ public interface PatronEvent extends DomainEvent {
         @NonNull PatronEvent.BookPlacedOnHoldOnce bookPlacedOnHoldOnce;
         @NonNull Option<MaximumNumberOfHoldsReached> maximumNumberOfHoldsReached;
 
-        @Override
-        public Instant getWhen() {
-            return bookPlacedOnHoldOnce.when;
-        }
-
         public static BookPlacedOnHold events(BookPlacedOnHoldOnce bookPlacedOnHoldOnce) {
             return new BookPlacedOnHold(bookPlacedOnHoldOnce.getPatronId(), bookPlacedOnHoldOnce, Option.none());
         }
@@ -84,10 +74,6 @@ public interface PatronEvent extends DomainEvent {
             return new BookPlacedOnHold(bookPlacedOnHoldOnce.patronId, bookPlacedOnHoldOnce, Option.of(maximumNumberOfHoldsReached));
         }
         
-        @Override
-        public List<DomainEvent> normalize() {
-            return List.<DomainEvent>of(bookPlacedOnHoldOnce).appendAll(maximumNumberOfHoldsReached.toList());
-        }
     }
 
     @Value
@@ -115,7 +101,7 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID libraryBranchId;
         @NonNull Instant till;
 
-        public static BookCollected bookCollectedNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType, 
+        public static BookCollected bookCollectedNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType,
                                                      LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
             return new BookCollected(
                     Instant.now(),
@@ -146,7 +132,7 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID bookId;
         UUID libraryBranchId;
 
-        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, 
+        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId,
                                                        UUID libraryBranchId, PatronId patronId) {
             return new BookHoldFailed(
                     rejection.getReason().getReason(),
@@ -202,7 +188,7 @@ public interface PatronEvent extends DomainEvent {
         UUID libraryBranchId;
         @NonNull String reason;
 
-        public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId, 
+        public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId,
                                                                      LibraryBranchId libraryBranchId, PatronId patronId,
                                                                      String reason) {
             return new BookHoldCancelingFailed(
@@ -213,7 +199,8 @@ public interface PatronEvent extends DomainEvent {
                     reason);
         }
     }
-// TODO 2019-04-16 gakshintala: clear out these eventIds
+
+    // TODO 2019-04-16 gakshintala: clear out these eventIds
     @Value
     class BookHoldExpired implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();

@@ -1,4 +1,4 @@
-package com.gakshintala.bookmybook.core.domain.common;
+package com.gakshintala.bookmybook.core.domain.library;
 
 import lombok.Value;
 
