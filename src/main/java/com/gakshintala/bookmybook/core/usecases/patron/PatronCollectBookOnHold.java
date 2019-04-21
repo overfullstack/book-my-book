@@ -51,10 +51,11 @@ public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.
     }
 
     private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> handleResult(Either<BookCollectingFailed, BookCollected> result) {
-        return result.map(bookCollected -> Try.of(() ->
-                Tuple.of((PatronEvent) bookCollected,
-                        handlePatronEvent.handle(bookCollected).get(),
-                        handlePatronEventInLibrary.handle(bookCollected).get())))
+        return result
+                .map(bookCollected -> handlePatronEvent.handle(bookCollected)
+                        .map(patron -> handlePatronEventInLibrary.handle(bookCollected)
+                                .map(catalogueBookInstanceUUID -> Tuple.of((PatronEvent) bookCollected, patron, catalogueBookInstanceUUID)))
+                        .get())
                 .getOrElseGet(bookCollectingFailed -> Try.success(Tuple.of(bookCollectingFailed, null, null)));
     }
 

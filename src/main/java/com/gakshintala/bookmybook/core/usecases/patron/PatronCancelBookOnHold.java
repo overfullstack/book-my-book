@@ -49,10 +49,10 @@ public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.Ca
 
     private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> handleResult(Either<BookHoldCancelingFailed, BookHoldCanceled> result) {
         return result
-                .map(bookHoldCanceled -> Try.of(() ->
-                        Tuple.of((PatronEvent) bookHoldCanceled,
-                                handlePatronEvent.handle(bookHoldCanceled).get(),
-                                handlePatronEventInLibrary.handle(bookHoldCanceled).get())))
+                .map(bookHoldCanceled -> handlePatronEvent.handle(bookHoldCanceled)
+                        .map(patron -> handlePatronEventInLibrary.handle(bookHoldCanceled)
+                                .map(catalogueBookInstanceUUID -> Tuple.of((PatronEvent) bookHoldCanceled, patron, catalogueBookInstanceUUID)))
+                        .get())
                 .getOrElseGet(bookHoldCancelingFailed -> Try.success(Tuple.of(bookHoldCancelingFailed, null, null)));
     }
 

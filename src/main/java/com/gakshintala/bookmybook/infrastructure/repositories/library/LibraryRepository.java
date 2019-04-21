@@ -12,7 +12,7 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;
-import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldOnce;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookReturned;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
@@ -184,7 +184,7 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
     public Try<CatalogueBookInstanceUUID> handle(PatronEvent event) {
         return Match(event).of(
                 Case($(instanceOf(BookPlacedOnHold.class)), this::handle),
-                Case($(instanceOf(BookPlacedOnHoldOnce.class)), this::handle),
+                Case($(instanceOf(BookPlacedOnHoldNow.class)), this::handle),
                 Case($(instanceOf(BookCollected.class)), this::handle),
                 Case($(instanceOf(BookHoldCanceled.class)), this::handle),
                 Case($(instanceOf(BookHoldExpired.class)), this::handle),
@@ -193,14 +193,14 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
     }
 
     private Try<CatalogueBookInstanceUUID> handle(BookPlacedOnHold bookPlacedOnHold) {
-        return this.handle(bookPlacedOnHold.getBookPlacedOnHoldOnce());
+        return this.handle(bookPlacedOnHold.getBookPlacedOnHoldNow());
     }
 
-    private Try<CatalogueBookInstanceUUID> handle(BookPlacedOnHoldOnce bookPlacedOnHoldOnce) {
-        return queryBookBy(new CatalogueBookInstanceUUID(bookPlacedOnHoldOnce.getBookId()))
-                .map(book -> handleBookPlacedOnHold(book._2, bookPlacedOnHoldOnce)
+    private Try<CatalogueBookInstanceUUID> handle(BookPlacedOnHoldNow bookPlacedOnHoldNow) {
+        return queryBookBy(new CatalogueBookInstanceUUID(bookPlacedOnHoldNow.getBookId()))
+                .map(book -> handleBookPlacedOnHold(book._2, bookPlacedOnHoldNow)
                         .map(this::updateOptimistically))
-                .map(ignore -> new CatalogueBookInstanceUUID(bookPlacedOnHoldOnce.getBookId()));
+                .map(ignore -> new CatalogueBookInstanceUUID(bookPlacedOnHoldNow.getBookId()));
     }
 
     private Try<CatalogueBookInstanceUUID> handle(BookCollected bookCollected) {
@@ -231,17 +231,17 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
                 .map(ignore -> new CatalogueBookInstanceUUID(bookReturned.getBookId()));
     }
 
-    private Option<? extends Book> handleBookPlacedOnHold(Book book, BookPlacedOnHoldOnce bookPlacedOnHoldOnce) {
+    private Option<? extends Book> handleBookPlacedOnHold(Book book, BookPlacedOnHoldNow bookPlacedOnHoldNow) {
         return Match(book).of(
-                Case($(instanceOf(AvailableBook.class)), availableBook -> Option(availableBook.handle(bookPlacedOnHoldOnce))),
-                Case($(instanceOf(BookOnHold.class)), bookOnHold -> bookNotAlreadyOnHoldByPatron(bookOnHold, bookPlacedOnHoldOnce)),
+                Case($(instanceOf(AvailableBook.class)), availableBook -> Option(availableBook.handle(bookPlacedOnHoldNow))),
+                Case($(instanceOf(BookOnHold.class)), bookOnHold -> bookNotAlreadyOnHoldByPatron(bookOnHold, bookPlacedOnHoldNow)),
                 Case($(), () -> Option(book))
         );
     }
 
-    private Option<BookOnHold> bookNotAlreadyOnHoldByPatron(BookOnHold onHold, BookPlacedOnHoldOnce bookPlacedOnHoldOnce) {
+    private Option<BookOnHold> bookNotAlreadyOnHoldByPatron(BookOnHold onHold, BookPlacedOnHoldNow bookPlacedOnHoldNow) {
         return Option(onHold)
-                .filter(onHoldBook -> !onHoldBook.by(new PatronId(bookPlacedOnHoldOnce.getPatronId())));
+                .filter(onHoldBook -> !onHoldBook.by(new PatronId(bookPlacedOnHoldNow.getPatronId())));
     }
 
     private Book handleBookHoldExpired(Book book, BookHoldExpired holdExpired) {

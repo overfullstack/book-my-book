@@ -36,7 +36,7 @@ public interface PatronEvent {
     }
 
     @Value
-    class BookPlacedOnHoldOnce implements PatronEvent {
+    class BookPlacedOnHoldNow implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -46,9 +46,9 @@ public interface PatronEvent {
         @NonNull Instant holdFrom;
         Instant holdTill;
 
-        public static BookPlacedOnHoldOnce bookPlacedOnHoldNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType,
-                                                               LibraryBranchId libraryBranchId, PatronId patronId, HoldDuration holdDuration) {
-            return new BookPlacedOnHoldOnce(
+        public static BookPlacedOnHoldNow bookPlacedOnHoldNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType,
+                                                              LibraryBranchId libraryBranchId, PatronId patronId, HoldDuration holdDuration) {
+            return new BookPlacedOnHoldNow(
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
@@ -63,15 +63,15 @@ public interface PatronEvent {
     class BookPlacedOnHold implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull UUID patronId;
-        @NonNull PatronEvent.BookPlacedOnHoldOnce bookPlacedOnHoldOnce;
+        @NonNull PatronEvent.BookPlacedOnHoldNow bookPlacedOnHoldNow;
         @NonNull Option<MaximumNumberOfHoldsReached> maximumNumberOfHoldsReached;
 
-        public static BookPlacedOnHold events(BookPlacedOnHoldOnce bookPlacedOnHoldOnce) {
-            return new BookPlacedOnHold(bookPlacedOnHoldOnce.getPatronId(), bookPlacedOnHoldOnce, Option.none());
+        public static BookPlacedOnHold with(BookPlacedOnHoldNow bookPlacedOnHoldNow) {
+            return new BookPlacedOnHold(bookPlacedOnHoldNow.getPatronId(), bookPlacedOnHoldNow, Option.none());
         }
 
-        public static BookPlacedOnHold events(BookPlacedOnHoldOnce bookPlacedOnHoldOnce, MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
-            return new BookPlacedOnHold(bookPlacedOnHoldOnce.patronId, bookPlacedOnHoldOnce, Option.of(maximumNumberOfHoldsReached));
+        public static BookPlacedOnHold with(BookPlacedOnHoldNow bookPlacedOnHoldNow, MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
+            return new BookPlacedOnHold(bookPlacedOnHoldNow.patronId, bookPlacedOnHoldNow, Option.of(maximumNumberOfHoldsReached));
         }
         
     }

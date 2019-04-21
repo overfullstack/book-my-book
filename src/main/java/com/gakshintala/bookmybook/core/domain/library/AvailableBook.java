@@ -36,12 +36,12 @@ public class AvailableBook implements Book {
         return bookInformation.getCatalogueBookInstanceUUID();
     }
 
-    public BookOnHold handle(PatronEvent.BookPlacedOnHoldOnce bookPlacedOnHoldOnce) {
+    public BookOnHold handle(PatronEvent.BookPlacedOnHoldNow bookPlacedOnHoldNow) {
         return new BookOnHold(
                 bookInformation,
-                new LibraryBranchId(bookPlacedOnHoldOnce.getLibraryBranchId()),
-                new PatronId(bookPlacedOnHoldOnce.getPatronId()),
-                bookPlacedOnHoldOnce.getHoldTill(),
+                new LibraryBranchId(bookPlacedOnHoldNow.getLibraryBranchId()),
+                new PatronId(bookPlacedOnHoldNow.getPatronId()),
+                bookPlacedOnHoldNow.getHoldTill(),
                 version);
     }
 }

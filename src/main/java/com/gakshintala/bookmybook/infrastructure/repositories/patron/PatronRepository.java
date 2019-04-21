@@ -8,7 +8,7 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
-import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldOnce;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookReturned;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.OverdueCheckoutRegistered;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
@@ -44,14 +44,14 @@ interface PatronEntityRepository extends CrudRepository<PatronDatabaseEntity, Lo
 @RequiredArgsConstructor
 public class PatronRepository implements FindPatron, PersistPatron, HandlePatronEvent {
     private final PatronEntityRepository patronEntityRepository;
-    
-    private final Function2<PatronDatabaseEntity, BookPlacedOnHoldOnce, PatronDatabaseEntity> handleBookPlacedOnHold = (entity, event) -> {
+
+    private final Function2<PatronDatabaseEntity, BookPlacedOnHoldNow, PatronDatabaseEntity> handleBookPlacedOnHold = (entity, event) -> {
         Set<HoldDatabaseEntity> booksOnHold = entity.booksOnHold;
         booksOnHold.add(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()));
         return entity.withBooksOnHold(booksOnHold);
     };
     private final Function2<PatronDatabaseEntity, BookPlacedOnHold, PatronDatabaseEntity> handleBookPlacedOnHoldEvents = (entity, placedOnHoldEvents) -> {
-        BookPlacedOnHoldOnce event = placedOnHoldEvents.getBookPlacedOnHoldOnce();
+        BookPlacedOnHoldNow event = placedOnHoldEvents.getBookPlacedOnHoldNow();
         return handleBookPlacedOnHold.apply(entity, event);
     };
     private final Function2<PatronDatabaseEntity, BookCollected, PatronDatabaseEntity> handleBookCollected =
@@ -70,7 +70,7 @@ public class PatronRepository implements FindPatron, PersistPatron, HandlePatron
     private final Function2<PatronEvent, PatronDatabaseEntity, PatronDatabaseEntity> handle =
             (event, entity) -> API.Match(event).of(
                     Case($(instanceOf(BookPlacedOnHold.class)), handleBookPlacedOnHoldEvents.curried().apply(entity)),
-                    Case($(instanceOf(BookPlacedOnHoldOnce.class)), handleBookPlacedOnHold.curried().apply(entity)),
+                    Case($(instanceOf(BookPlacedOnHoldNow.class)), handleBookPlacedOnHold.curried().apply(entity)),
                     Case($(instanceOf(BookCollected.class)), handleBookCollected.curried().apply(entity)),
                     Case($(instanceOf(BookHoldCanceled.class)), handleBookHoldCanceled.curried().apply(entity)),
                     Case($(instanceOf(BookHoldExpired.class)), handleBookHoldExpired.curried().apply(entity)),
