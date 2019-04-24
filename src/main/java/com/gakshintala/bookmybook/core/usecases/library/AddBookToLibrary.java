@@ -3,7 +3,7 @@ package com.gakshintala.bookmybook.core.usecases.library;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBookId;
 import com.gakshintala.bookmybook.core.ports.repositories.library.PersistBookInLibrary;
-import com.gakshintala.bookmybook.core.usecases.UseCase;
+import com.gakshintala.bookmybook.core.ports.UseCase;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Try;

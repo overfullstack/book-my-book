@@ -6,7 +6,7 @@ import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUI
 import com.gakshintala.bookmybook.core.domain.catalogue.ISBN;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.FindCatalogueBook;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistBookInstance;
-import com.gakshintala.bookmybook.core.usecases.UseCase;
+import com.gakshintala.bookmybook.core.ports.UseCase;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;

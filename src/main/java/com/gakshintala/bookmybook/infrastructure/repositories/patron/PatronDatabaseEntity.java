@@ -11,12 +11,16 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import org.springframework.data.annotation.Id;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.UUID;
 
 @Data
 @Wither
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "patron_database_entity")
 public class PatronDatabaseEntity {
     @Id
     Long id;

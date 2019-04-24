@@ -60,11 +60,10 @@ public class PatronRepository implements FindPatron, PersistPatron, HandlePatron
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
     private final Function2<PatronDatabaseEntity, BookHoldExpired, PatronDatabaseEntity> handleBookHoldExpired =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
-    private final Function2<PatronDatabaseEntity, OverdueCheckoutRegistered, PatronDatabaseEntity> handleOverdueCheckoutRegistered = (entity, event) -> {
-        Set<OverdueCheckoutDatabaseEntity> checkouts = entity.checkouts;
-        checkouts.add(new OverdueCheckoutDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId()));
-        return entity.withCheckouts(checkouts);
-    };
+    private final Function2<PatronDatabaseEntity, OverdueCheckoutRegistered, PatronDatabaseEntity> handleOverdueCheckoutRegistered =
+            (entity, event) -> entity
+                    .withCheckouts(entity.getCheckouts().add(new OverdueCheckoutDatabaseEntity(
+                            event.getBookId(), event.getPatronId(), event.getLibraryBranchId())));
     private final Function2<PatronDatabaseEntity, BookReturned, PatronDatabaseEntity> handleBookReturned =
             (entity, event) -> removeOverdueCheckoutIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
     private final Function2<PatronEvent, PatronDatabaseEntity, PatronDatabaseEntity> handle =
@@ -110,10 +109,9 @@ public class PatronRepository implements FindPatron, PersistPatron, HandlePatron
     }
 
     private PatronDatabaseEntity removeOverdueCheckoutIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId, PatronDatabaseEntity entity) {
-        final Set<OverdueCheckoutDatabaseEntity> nonPatronOverdueCheckouts = entity.checkouts.toStream()
+        return entity.withCheckouts(entity.getCheckouts().toStream()
                 .filter(overdueCheckoutDatabaseEntity -> overdueCheckoutDatabaseEntity.is(patronId, bookId, libraryBranchId))
-                .toSet();
-        return entity.withCheckouts(nonPatronOverdueCheckouts);
+                .toSet());
     }
 
 }

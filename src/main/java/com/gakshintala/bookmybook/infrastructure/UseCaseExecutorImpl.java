@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.infrastructure;
 
-import com.gakshintala.bookmybook.core.usecases.UseCase;
-import com.gakshintala.bookmybook.core.usecases.UseCaseExecutor;
+import com.gakshintala.bookmybook.core.ports.UseCase;
+import com.gakshintala.bookmybook.core.ports.UseCaseExecutor;
 import io.vavr.control.Try;
 import org.springframework.stereotype.Service;
 

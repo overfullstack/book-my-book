@@ -1,4 +1,4 @@
-package com.gakshintala.bookmybook.core.usecases;
+package com.gakshintala.bookmybook.core.ports;
 
 import io.vavr.control.Try;
 

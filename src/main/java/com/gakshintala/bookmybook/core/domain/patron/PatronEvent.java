@@ -190,13 +190,13 @@ public interface PatronEvent {
 
         public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId,
                                                                      LibraryBranchId libraryBranchId, PatronId patronId,
-                                                                     String reason) {
+                                                                     Rejection rejection) {
             return new BookHoldCancelingFailed(
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),
                     libraryBranchId.getLibraryBranchUUID(),
-                    reason);
+                    rejection.getReason().getReason());
         }
     }
 

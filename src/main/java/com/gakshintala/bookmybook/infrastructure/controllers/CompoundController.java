@@ -5,7 +5,7 @@ import com.gakshintala.bookmybook.adapters.rest.compound.request.PlaceBookOnHold
 import com.gakshintala.bookmybook.adapters.rest.library.response.AddBookToLibraryResponse;
 import com.gakshintala.bookmybook.adapters.rest.patron.response.PatronEventResponse;
 import com.gakshintala.bookmybook.core.ports.controllers.CompoundResource;
-import com.gakshintala.bookmybook.core.usecases.UseCaseExecutor;
+import com.gakshintala.bookmybook.core.ports.UseCaseExecutor;
 import com.gakshintala.bookmybook.core.usecases.compound.AddBookEverywhere;
 import com.gakshintala.bookmybook.core.usecases.compound.PlaceBookOnHoldCompound;
 import lombok.RequiredArgsConstructor;

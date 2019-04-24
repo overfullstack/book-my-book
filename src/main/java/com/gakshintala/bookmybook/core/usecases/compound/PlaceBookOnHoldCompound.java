@@ -4,7 +4,7 @@ import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUI
 import com.gakshintala.bookmybook.core.domain.patron.HoldDuration;
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
-import com.gakshintala.bookmybook.core.usecases.UseCase;
+import com.gakshintala.bookmybook.core.ports.UseCase;
 import com.gakshintala.bookmybook.core.usecases.compound.AddBookEverywhere.AddBookEverywhereCommand;
 import com.gakshintala.bookmybook.core.usecases.patron.CreatePatron;
 import com.gakshintala.bookmybook.core.usecases.patron.CreatePatron.CreatePatronCommand;
@@ -29,7 +29,7 @@ public class PlaceBookOnHoldCompound implements UseCase<PlaceBookOnHoldCompound.
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> execute(@NonNull PlaceBookOnHoldCompound.PlaceOnHoldCompoundCommand command) {
         return addBookEverywhere.execute(command.getAddBookEverywhereCommand())
                 .map(tuple2 -> createPatron.execute(command.createPatronCommand)
-                        .map(patron -> placeBookOnHold.placeOnHold(patron, tuple2._2, command.holdDuration))
+                        .map(patron -> patron.canPatronPlaceOnHold(tuple2._2, command.holdDuration))
                         .flatMap(placeBookOnHold::handleResult))
                 .get();
     }

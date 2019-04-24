@@ -6,7 +6,7 @@ import com.gakshintala.bookmybook.core.domain.library.Version;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBookId;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
-import com.gakshintala.bookmybook.core.usecases.UseCase;
+import com.gakshintala.bookmybook.core.ports.UseCase;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookInstanceToCatalogue;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookToCatalogue;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookToCatalogue.AddBookToCatalogueCommand;

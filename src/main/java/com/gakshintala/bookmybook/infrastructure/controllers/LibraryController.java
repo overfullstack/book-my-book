@@ -5,7 +5,7 @@ import com.gakshintala.bookmybook.adapters.rest.library.response.AddBookToLibrar
 import com.gakshintala.bookmybook.core.ports.controllers.LibraryResource;
 import com.gakshintala.bookmybook.core.usecases.compound.AddBookEverywhere;
 import com.gakshintala.bookmybook.core.usecases.library.AddBookToLibrary;
-import com.gakshintala.bookmybook.core.usecases.UseCaseExecutor;
+import com.gakshintala.bookmybook.core.ports.UseCaseExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 

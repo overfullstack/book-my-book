@@ -14,7 +14,7 @@ import com.gakshintala.bookmybook.core.ports.repositories.library.FindBookOnHold
 import com.gakshintala.bookmybook.core.ports.repositories.library.HandlePatronEventInLibrary;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.FindPatron;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.HandlePatronEvent;
-import com.gakshintala.bookmybook.core.usecases.UseCase;
+import com.gakshintala.bookmybook.core.ports.UseCase;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.control.Either;
@@ -61,8 +61,7 @@ public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.
 
     private Either<BookCollectingFailed, BookCollected> collect(Patron patron, BookOnHold book, CheckoutDuration duration) {
         return patron.getPatronHolds().a(book)
-                ? right(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(),
-                patron.getPatronInformation().getPatronId(), duration))
+                ? right(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId(), duration))
                 : left(bookCollectingFailedNow(withReason("Patron doesn't hold this book to Collect"),
                 book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId()));
     }

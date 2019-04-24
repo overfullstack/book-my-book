@@ -5,10 +5,14 @@ import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
 @Data
+@Entity
+@Table(name = "book_database_entity")
 @NoArgsConstructor
 public class BookDatabaseEntity {
 

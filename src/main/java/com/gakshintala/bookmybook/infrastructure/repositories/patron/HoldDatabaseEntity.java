@@ -4,10 +4,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
 @Data
+@Entity
+@Table(name = "hold_database_entity")
 @NoArgsConstructor
 public class HoldDatabaseEntity {
 

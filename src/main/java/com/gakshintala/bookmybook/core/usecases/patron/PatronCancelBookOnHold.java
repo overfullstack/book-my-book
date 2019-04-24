@@ -8,11 +8,11 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCancelingFailed;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
+import com.gakshintala.bookmybook.core.ports.UseCase;
 import com.gakshintala.bookmybook.core.ports.repositories.library.FindBookOnHold;
 import com.gakshintala.bookmybook.core.ports.repositories.library.HandlePatronEventInLibrary;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.FindPatron;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.HandlePatronEvent;
-import com.gakshintala.bookmybook.core.usecases.UseCase;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.control.Either;
@@ -26,6 +26,7 @@ import java.time.Instant;
 
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled.holdCanceledNow;
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCancelingFailed.holdCancelingFailedNow;
+import static com.gakshintala.bookmybook.core.domain.patron.Rejection.withReason;
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 
@@ -60,7 +61,7 @@ public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.Ca
         return patron.getPatronHolds().a(book)
                 ? right(holdCanceledNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId()))
                 : left(holdCancelingFailedNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronInformation().getPatronId(),
-                "Patron doesn't hold this book to Cancel"));
+                withReason("Patron doesn't hold this book to Cancel")));
     }
 
     @Value

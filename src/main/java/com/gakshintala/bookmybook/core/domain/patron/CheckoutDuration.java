@@ -12,13 +12,13 @@ import static java.time.Instant.now;
 @Value
 public class CheckoutDuration {
 
-    static final int MAX_CHECKOUT_DURATION  = 60;
+    private static final int MAX_CHECKOUT_DURATION = 60;
 
     @NonNull NumberOfDays noOfDays;
     @NonNull Instant from;
 
     private CheckoutDuration(Instant from, NumberOfDays noOfDays) {
-        if(noOfDays.isGreaterThan(MAX_CHECKOUT_DURATION)) {
+        if (noOfDays.isGreaterThan(MAX_CHECKOUT_DURATION)) {
             throw new IllegalArgumentException("Cannot checkout for more than " + MAX_CHECKOUT_DURATION + " days!");
         }
         this.noOfDays = noOfDays;

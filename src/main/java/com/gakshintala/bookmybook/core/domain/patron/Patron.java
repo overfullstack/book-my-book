@@ -1,29 +1,70 @@
 package com.gakshintala.bookmybook.core.domain.patron;
 
 
+import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldFailed;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
 import io.vavr.collection.List;
-import lombok.AllArgsConstructor;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 
+import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldFailed.bookHoldFailedNow;
+import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold.with;
+import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow.bookPlacedOnHoldNow;
+import static com.gakshintala.bookmybook.core.domain.patron.PatronHolds.MAX_NUMBER_OF_HOLDS;
+
 @Value
-@AllArgsConstructor
 @EqualsAndHashCode(of = "patronInformation")
 public class Patron {
 
     @NonNull
-    private final PatronInformation patronInformation;
+    PatronInformation patronInformation;
 
     @NonNull
-    private final List<PlacingOnHoldPolicy> placingOnHoldPolicies;
+    List<PlacingOnHoldPolicy> placingOnHoldPolicies;
 
     @NonNull
-    private final OverdueCheckouts overdueCheckouts;
+    OverdueCheckouts overdueCheckouts;
 
     @NonNull
-    private final PatronHolds patronHolds;
+    PatronHolds patronHolds;
+
+    public Either<BookHoldFailed, BookPlacedOnHold> canPatronPlaceOnHold(AvailableBook aBook, HoldDuration duration) {
+        return validateCanPatronPlaceOnHold(aBook, duration)
+                .map(rejection -> getBookHoldFailed(aBook, rejection))
+                .toEither(getBookPlacedOnHold(aBook, duration))
+                .swap();
+    }
+
+    private BookHoldFailed getBookHoldFailed(AvailableBook aBook, Rejection rejection) {
+        return bookHoldFailedNow(rejection, aBook.getBookInstanceId(), aBook.getLibraryBranchId().getLibraryBranchUUID(),
+                patronInformation.getPatronId());
+    }
+
+    private BookPlacedOnHold getBookPlacedOnHold(AvailableBook aBook, HoldDuration duration) {
+        return patronHolds.maximumHoldsAfterHolding()
+                ? with(getBookPlacedOnHoldNow(aBook, duration),
+                PatronEvent.MaximumNumberOfHoldsReached.now(patronInformation, MAX_NUMBER_OF_HOLDS))
+                : with(getBookPlacedOnHoldNow(aBook, duration));
+    }
+
+    private BookPlacedOnHoldNow getBookPlacedOnHoldNow(AvailableBook aBook, HoldDuration duration) {
+        return bookPlacedOnHoldNow(aBook.getBookInstanceId(), aBook.type(),
+                aBook.getLibraryBranchId(), patronInformation.getPatronId(), duration);
+    }
+
+    private Option<Rejection> validateCanPatronPlaceOnHold(AvailableBook availableBook, HoldDuration forDuration) {
+        return placingOnHoldPolicies
+                .toStream()
+                .map(policy -> policy.apply(availableBook, this, forDuration))
+                .find(Either::isLeft)
+                .map(Either::getLeft);
+    }
 
     boolean isRegular() {
         return patronInformation.isRegular();
@@ -33,11 +74,9 @@ public class Patron {
         return overdueCheckouts.countAt(libraryBranch);
     }
 
-    public int numberOfHolds() {
+    int numberOfHolds() {
         return patronHolds.count();
     }
-
-
 
 }
 
