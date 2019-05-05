@@ -25,6 +25,7 @@ class PatronPlaceBookOnHoldTest extends Specification {
     Patron researcherPatron = researcherPatron(anyPatronId())
     AvailableBook circulatingAvailableBook = circulatingAvailableBook()
     AvailableBook restrictedAvailableBook = restrictedBook()
+    
     FindAvailableBook willFindCirculatingBook = { id -> Try.of({ -> circulatingAvailableBook }) }
     FindAvailableBook willFindRestrictedBook = { id -> Try.of({ -> restrictedAvailableBook }) }
     
@@ -40,8 +41,10 @@ class PatronPlaceBookOnHoldTest extends Specification {
         given:
         PatronPlaceBookOnHold patronPlaceBookOnHold = new PatronPlaceBookOnHold(willFindCirculatingBook, willFindRegularPatron, 
                 handlePatronEvent, handlePatronEventInLibrary)
+        
         when:
         Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
+        
         then:
         result.isSuccess()
         result.get()._1() in BookPlacedOnHold
@@ -55,8 +58,10 @@ class PatronPlaceBookOnHoldTest extends Specification {
         given:
         PatronPlaceBookOnHold patronPlaceBookOnHold = new PatronPlaceBookOnHold(willFindRestrictedBook, willFindRegularPatron, 
                 handlePatronEvent, handlePatronEventInLibrary)
+        
         when:
         Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
+        
         then:
         result.isSuccess()
         result.get()._1() in PatronEvent.BookHoldFailed
@@ -66,8 +71,10 @@ class PatronPlaceBookOnHoldTest extends Specification {
         given:
         PatronPlaceBookOnHold patronPlaceBookOnHold = new PatronPlaceBookOnHold(willFindRestrictedBook, willFindResearcherPatron,
                 handlePatronEvent, handlePatronEventInLibrary)
+        
         when:
         Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
+        
         then:
         result.isSuccess()
         result.get()._1() in BookPlacedOnHold

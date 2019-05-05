@@ -1,5 +1,7 @@
 # Book-my-Book
 
+![](docs/book-my-book.png)
+
 (DDD)
     .andThen(Clean Architecture/Ports & Adapters)
         .andThen(Functional Programming)
