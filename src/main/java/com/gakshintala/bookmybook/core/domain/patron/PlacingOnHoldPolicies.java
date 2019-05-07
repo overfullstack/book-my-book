@@ -12,7 +12,7 @@ public class PlacingOnHoldPolicies {
 
     public static final PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
         if (toHold.isRestricted() && patron.isRegular()) {
-            return left(Rejection.withReason("Regular patrons cannot hold restricted books"));
+            return left(Rejection.withReason("REGULAR patrons cannot hold restricted books"));
         }
         return right(new Allowance());
     };

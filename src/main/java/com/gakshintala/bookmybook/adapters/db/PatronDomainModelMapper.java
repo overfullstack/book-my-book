@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.adapters.db;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.patron.Hold;
 import com.gakshintala.bookmybook.core.domain.patron.OverdueCheckouts;
@@ -13,7 +13,6 @@ import com.gakshintala.bookmybook.infrastructure.repositories.patron.OverdueChec
 import com.gakshintala.bookmybook.infrastructure.repositories.patron.PatronDatabaseEntity;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashSet;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import lombok.experimental.UtilityClass;
@@ -32,36 +31,30 @@ public class PatronDomainModelMapper {
         );
     }
 
-    private static Patron create(PatronType patronType, PatronId patronId, Set<Tuple2<CatalogueBookInstanceUUID, LibraryBranchId>> patronHolds,
-                                 Map<LibraryBranchId, Set<CatalogueBookInstanceUUID>> overdueCheckouts) {
+    private static Patron create(PatronType patronType, PatronId patronId, Set<Tuple2<CatalogueBookInstanceId, LibraryBranchId>> patronHolds,
+                                 Map<LibraryBranchId, Set<CatalogueBookInstanceId>> overdueCheckouts) {
         return new Patron(new PatronInformation(patronId, patronType),
                 allCurrentPolicies(),
                 new OverdueCheckouts(overdueCheckouts),
-                new PatronHolds(patronHolds.toStream()
+                new PatronHolds(patronHolds
                         .map(tuple -> new Hold(tuple._1, tuple._2))
                         .toSet()));
     }
 
-    private static Map<LibraryBranchId, Set<CatalogueBookInstanceUUID>> mapPatronOverdueCheckouts(PatronDatabaseEntity patronDatabaseEntity) {
+    private static Map<LibraryBranchId, Set<CatalogueBookInstanceId>> mapPatronOverdueCheckouts(PatronDatabaseEntity patronDatabaseEntity) {
         return patronDatabaseEntity
                 .getCheckouts()
-                .toStream()
-                .toMap(OverdueCheckoutDatabaseEntity::getLibraryBranchId, HashSet::of)
-                .toSet()
-                .toStream()
+                .groupBy(OverdueCheckoutDatabaseEntity::getLibraryBranchId)
                 .toMap(entry -> new LibraryBranchId(entry._1()),
-                        entry -> entry
-                                ._2()
-                                .toStream()
-                                .map(entity -> (new CatalogueBookInstanceUUID(entity.getBookId())))
+                        entry -> entry._2()
+                                .map(entity -> new CatalogueBookInstanceId(entity.getBookId()))
                                 .toSet());
     }
 
-    private static Set<Tuple2<CatalogueBookInstanceUUID, LibraryBranchId>> mapPatronHolds(PatronDatabaseEntity patronDatabaseEntity) {
+    private static Set<Tuple2<CatalogueBookInstanceId, LibraryBranchId>> mapPatronHolds(PatronDatabaseEntity patronDatabaseEntity) {
         return patronDatabaseEntity
                 .getBooksOnHold()
-                .toStream()
-                .map(entity -> Tuple.of((new CatalogueBookInstanceUUID(entity.getBookId())), new LibraryBranchId(entity.getLibraryBranchId())))
+                .map(entity -> Tuple.of((new CatalogueBookInstanceId(entity.getBookId())), new LibraryBranchId(entity.getLibraryBranchId())))
                 .toSet();
     }
 

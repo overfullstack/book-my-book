@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.fixtures;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.patron.Hold;
@@ -19,8 +19,8 @@ import io.vavr.collection.Set;
 
 import java.util.UUID;
 
-import static com.gakshintala.bookmybook.core.domain.patron.PatronType.Regular;
-import static com.gakshintala.bookmybook.core.domain.patron.PatronType.Researcher;
+import static com.gakshintala.bookmybook.core.domain.patron.PatronType.REGULAR;
+import static com.gakshintala.bookmybook.core.domain.patron.PatronType.RESEARCHER;
 import static com.gakshintala.bookmybook.core.domain.patron.PlacingOnHoldPolicies.allCurrentPolicies;
 import static com.gakshintala.bookmybook.core.domain.patron.PlacingOnHoldPolicies.onlyResearcherPatronsCanHoldRestrictedBooksPolicy;
 import static com.gakshintala.bookmybook.core.domain.patron.PlacingOnHoldPolicies.overdueCheckoutsRejectionPolicy;
@@ -36,19 +36,19 @@ public class PatronFixture {
     }
 
     public static Patron regularPatronWithPolicy(PlacingOnHoldPolicy placingOnHoldPolicy) {
-        return patronWithPolicy(anyPatronId(), Regular, placingOnHoldPolicy);
+        return patronWithPolicy(anyPatronId(), REGULAR, placingOnHoldPolicy);
     }
 
     public static Patron researcherPatronWithPolicy(PlacingOnHoldPolicy placingOnHoldPolicy) {
-        return patronWithPolicy(anyPatronId(), Researcher, placingOnHoldPolicy);
+        return patronWithPolicy(anyPatronId(), RESEARCHER, placingOnHoldPolicy);
     }
 
     public static Patron regularPatronWithPolicy(PatronId patronId, PlacingOnHoldPolicy placingOnHoldPolicy) {
-        return patronWithPolicy(patronId, Regular, placingOnHoldPolicy);
+        return patronWithPolicy(patronId, REGULAR, placingOnHoldPolicy);
     }
 
     public static Patron researcherPatronWithPolicy(PatronId patronId, PlacingOnHoldPolicy placingOnHoldPolicy) {
-        return patronWithPolicy(patronId, Researcher, placingOnHoldPolicy);
+        return patronWithPolicy(patronId, RESEARCHER, placingOnHoldPolicy);
     }
 
     private static Patron patronWithPolicy(PatronId patronId, PatronType type, PlacingOnHoldPolicy placingOnHoldPolicy) {
@@ -60,7 +60,7 @@ public class PatronFixture {
 
     private static Patron regularPatron(PatronId patronId) {
         return new Patron(
-                patronInformation(patronId, Regular),
+                patronInformation(patronId, REGULAR),
                 List.of(onlyResearcherPatronsCanHoldRestrictedBooksPolicy),
                 new OverdueCheckouts(HashMap.empty()),
                 noHolds());
@@ -68,7 +68,7 @@ public class PatronFixture {
 
     public static Patron researcherPatron(PatronId patronId) {
         return new Patron(
-                patronInformation(patronId, Researcher),
+                patronInformation(patronId, RESEARCHER),
                 List.of(onlyResearcherPatronsCanHoldRestrictedBooksPolicy),
                 new OverdueCheckouts(HashMap.empty()),
                 noHolds());
@@ -81,7 +81,7 @@ public class PatronFixture {
     public static Patron regularPatronWithHolds(int numberOfHolds) {
         PatronId patronId = anyPatronId();
         return new Patron(
-                patronInformation(patronId, Regular),
+                patronInformation(patronId, REGULAR),
                 List.of(regularPatronMaximumNumberOfHoldsPolicy),
                 new OverdueCheckouts(HashMap.empty()),
                 booksOnHold(numberOfHolds));
@@ -91,7 +91,7 @@ public class PatronFixture {
         PatronId patronId = anyPatronId();
         PatronHolds patronHolds = new PatronHolds(HashSet.of(hold));
         return new Patron(
-                patronInformation(patronId, Regular),
+                patronInformation(patronId, REGULAR),
                 allCurrentPolicies(),
                 new OverdueCheckouts(HashMap.empty()),
                 patronHolds);
@@ -100,7 +100,7 @@ public class PatronFixture {
     public static Patron regularPatronWith(BookOnHold bookOnHold, PatronId patronId) {
         PatronHolds patronHolds = new PatronHolds(HashSet.of(new Hold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt())));
         return new Patron(
-                patronInformation(patronId, Regular),
+                patronInformation(patronId, REGULAR),
                 allCurrentPolicies(),
                 new OverdueCheckouts(HashMap.empty()),
                 patronHolds);
@@ -118,27 +118,27 @@ public class PatronFixture {
     static Patron researcherPatronWithHolds(int numberOfHolds) {
         PatronId patronId = anyPatronId();
         return new Patron(
-                patronInformation(patronId, Researcher),
+                patronInformation(patronId, RESEARCHER),
                 List.of(regularPatronMaximumNumberOfHoldsPolicy),
                 new OverdueCheckouts(HashMap.empty()),
                 booksOnHold(numberOfHolds));
     }
 
-    static Patron regularPatronWithOverdueCheckouts(LibraryBranchId libraryBranchId, Set<CatalogueBookInstanceUUID> overdueBooks) {
-        Map<LibraryBranchId, Set<CatalogueBookInstanceUUID>> overdueCheckouts = HashMap.empty();
+    static Patron regularPatronWithOverdueCheckouts(LibraryBranchId libraryBranchId, Set<CatalogueBookInstanceId> overdueBooks) {
+        Map<LibraryBranchId, Set<CatalogueBookInstanceId>> overdueCheckouts = HashMap.empty();
         overdueCheckouts.put(libraryBranchId, overdueBooks);
         return new Patron(
-                patronInformation(anyPatronId(), Regular),
+                patronInformation(anyPatronId(), REGULAR),
                 List.of(overdueCheckoutsRejectionPolicy),
                 new OverdueCheckouts(overdueCheckouts),
                 noHolds());
     }
 
     static Patron regularPatronWith3_OverdueCheckoutsAt(LibraryBranchId libraryBranchId) {
-        Map<LibraryBranchId, Set<CatalogueBookInstanceUUID>> overdueCheckouts = HashMap.empty();
+        Map<LibraryBranchId, Set<CatalogueBookInstanceId>> overdueCheckouts = HashMap.empty();
         overdueCheckouts.put(libraryBranchId, HashSet.of(anyBookId(), anyBookId(), anyBookId()));
         return new Patron(
-                patronInformation(anyPatronId(), Regular),
+                patronInformation(anyPatronId(), REGULAR),
                 List.of(overdueCheckoutsRejectionPolicy),
                 new OverdueCheckouts(overdueCheckouts),
                 noHolds());

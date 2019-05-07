@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.core.domain.library;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookReturned;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import lombok.AllArgsConstructor;
@@ -26,12 +26,12 @@ public class CollectedBook implements Book {
     @NonNull
     Version version;
 
-    public CollectedBook(CatalogueBookInstanceUUID catalogueBookInstanceUUID, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Version version) {
-        this(new BookInformation(catalogueBookInstanceUUID, type), libraryBranchId, patronId, version);
+    public CollectedBook(CatalogueBookInstanceId catalogueBookInstanceId, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Version version) {
+        this(new BookInformation(catalogueBookInstanceId, type), libraryBranchId, patronId, version);
     }
 
-    public CatalogueBookInstanceUUID getBookId() {
-        return bookInformation.getCatalogueBookInstanceUUID();
+    public CatalogueBookInstanceId getBookId() {
+        return bookInformation.getCatalogueBookInstanceId();
     }
 
     public AvailableBook handle(BookReturned bookReturnedByPatron) {

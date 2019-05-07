@@ -1,8 +1,8 @@
 package com.gakshintala.bookmybook.core.domain.library;
 
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -10,7 +10,7 @@ import lombok.Value;
 public class BookInformation {
 
     @NonNull
-    CatalogueBookInstanceUUID catalogueBookInstanceUUID;
+    CatalogueBookInstanceId catalogueBookInstanceId;
 
     @NonNull
     BookType bookType;

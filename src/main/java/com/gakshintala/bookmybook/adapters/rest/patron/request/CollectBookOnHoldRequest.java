@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.adapters.rest.patron.request;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.patron.CheckoutDuration;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
@@ -14,7 +14,7 @@ import java.time.Instant;
 public class CollectBookOnHoldRequest {
     @NotBlank String patronId;
     @NotBlank String libraryBranchId;
-    @NotBlank String catalogueBookInstanceUUID;
+    @NotBlank String catalogueBookInstanceId;
     Integer noOfDays;
 
     public PatronCollectBookOnHold.CollectBookCommand toCommand() {
@@ -22,7 +22,7 @@ public class CollectBookOnHoldRequest {
                 Instant.now(),
                 PatronId.fromString(patronId),
                 LibraryBranchId.fromString(libraryBranchId),
-                CatalogueBookInstanceUUID.fromString(catalogueBookInstanceUUID),
+                CatalogueBookInstanceId.fromString(catalogueBookInstanceId),
                 CheckoutDuration.forNoOfDays(noOfDays)
         );
     }

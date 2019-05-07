@@ -2,12 +2,12 @@ package com.gakshintala.bookmybook.infrastructure.controllers;
 
 import com.gakshintala.bookmybook.adapters.rest.catalogue.request.AddBookInstanceToCatalogueRequest;
 import com.gakshintala.bookmybook.adapters.rest.catalogue.request.AddBookToCatalogueRequest;
-import com.gakshintala.bookmybook.adapters.rest.catalogue.response.CatalogueBookInstanceUUIDResponse;
 import com.gakshintala.bookmybook.adapters.rest.catalogue.response.CatalogueBookIdResponse;
+import com.gakshintala.bookmybook.adapters.rest.catalogue.response.CatalogueBookInstanceIdResponse;
+import com.gakshintala.bookmybook.core.ports.UseCaseExecutor;
 import com.gakshintala.bookmybook.core.ports.controllers.CatalogueResource;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookInstanceToCatalogue;
 import com.gakshintala.bookmybook.core.usecases.catalogue.AddBookToCatalogue;
-import com.gakshintala.bookmybook.core.ports.UseCaseExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,12 +33,12 @@ public class CatalogueController implements CatalogueResource {
     }
 
     @Override
-    public CompletableFuture<CatalogueBookInstanceUUIDResponse> addBookInstanceToCatalogue(@Valid AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest,
-                                                                                           HttpServletRequest httpServletRequest) {
+    public CompletableFuture<CatalogueBookInstanceIdResponse> addBookInstanceToCatalogue(@Valid AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest,
+                                                                                         HttpServletRequest httpServletRequest) {
         return useCaseExecutor.execute(
                 addBookInstanceToCatalogue,
                 addBookInstanceToCatalogueRequest.toCommand(),
-                CatalogueBookInstanceUUIDResponse::fromResult
+                CatalogueBookInstanceIdResponse::fromResult
         );
     }
 }

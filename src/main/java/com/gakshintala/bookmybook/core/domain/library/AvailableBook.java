@@ -1,14 +1,16 @@
 package com.gakshintala.bookmybook.core.domain.library;
 
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
+
+import static com.gakshintala.bookmybook.core.domain.catalogue.BookType.RESTRICTED;
 
 @Value
 @AllArgsConstructor
@@ -24,16 +26,16 @@ public class AvailableBook implements Book {
     @NonNull
     Version version;
 
-    public AvailableBook(CatalogueBookInstanceUUID catalogueBookInstanceUUID, BookType type, LibraryBranchId libraryBranchId, Version version) {
-        this(new BookInformation(catalogueBookInstanceUUID, type), libraryBranchId, version);
+    public AvailableBook(CatalogueBookInstanceId catalogueBookInstanceId, BookType type, LibraryBranchId libraryBranchId, Version version) {
+        this(new BookInformation(catalogueBookInstanceId, type), libraryBranchId, version);
     }
     
     public boolean isRestricted() {
-        return bookInformation.getBookType().equals(BookType.Restricted);
+        return RESTRICTED.equals(bookInformation.getBookType());
     }
 
-    public CatalogueBookInstanceUUID getBookInstanceId() {
-        return bookInformation.getCatalogueBookInstanceUUID();
+    public CatalogueBookInstanceId getBookInstanceId() {
+        return bookInformation.getCatalogueBookInstanceId();
     }
 
     public BookOnHold handle(PatronEvent.BookPlacedOnHoldNow bookPlacedOnHoldNow) {

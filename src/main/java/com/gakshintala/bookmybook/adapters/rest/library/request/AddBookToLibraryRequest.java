@@ -1,8 +1,8 @@
 package com.gakshintala.bookmybook.adapters.rest.library.request;
 
-import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
+import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.library.Version;
 import lombok.Value;
@@ -21,7 +21,7 @@ public class AddBookToLibraryRequest {
     public AddBookToLibraryCommand toCommand() {
         return new AddBookToLibraryCommand(
                 new AvailableBook(
-                        CatalogueBookInstanceUUID.fromString(this.getBookInstanceId()),
+                        CatalogueBookInstanceId.fromString(this.getBookInstanceId()),
                         BookType.fromString(this.getBookType()),
                         LibraryBranchId.randomLibraryId(),
                         Version.zero()

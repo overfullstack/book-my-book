@@ -102,14 +102,14 @@ public class PatronRepository implements FindPatron, PersistPatron, HandlePatron
     }
 
     private PatronDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId, PatronDatabaseEntity entity) {
-        final Set<HoldDatabaseEntity> nonPatronBookHolds = entity.booksOnHold.toStream()
+        final Set<HoldDatabaseEntity> nonPatronBookHolds = entity.booksOnHold
                 .filter(holdDatabaseEntity -> !holdDatabaseEntity.is(patronId, bookId, libraryBranchId))
                 .toSet();
         return entity.withBooksOnHold(nonPatronBookHolds);
     }
 
     private PatronDatabaseEntity removeOverdueCheckoutIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId, PatronDatabaseEntity entity) {
-        return entity.withCheckouts(entity.getCheckouts().toStream()
+        return entity.withCheckouts(entity.getCheckouts()
                 .filter(overdueCheckoutDatabaseEntity -> overdueCheckoutDatabaseEntity.is(patronId, bookId, libraryBranchId))
                 .toSet());
     }

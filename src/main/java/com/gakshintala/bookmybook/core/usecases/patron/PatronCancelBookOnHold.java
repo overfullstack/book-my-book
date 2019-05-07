@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.core.usecases.patron;
 
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
@@ -32,15 +32,15 @@ import static io.vavr.control.Either.right;
 
 @Service
 @RequiredArgsConstructor
-public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.CancelHoldCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>>> {
+public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.CancelHoldCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>>> {
     private final FindBookOnHold findBookOnHold;
     private final FindPatron findPatron;
     private final HandlePatronEvent handlePatronEvent;
     private final HandlePatronEventInLibrary handlePatronEventInLibrary;
 
     @Override
-    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> execute(@NonNull CancelHoldCommand command) {
-        return findBookOnHold.findBookOnHold(command.getCatalogueBookInstanceUUID())
+    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull CancelHoldCommand command) {
+        return findBookOnHold.findBookOnHold(command.getCatalogueBookInstanceId())
                 .map(bookOnHold -> findPatron.findBy(command.getPatronId())
                         .map(patron -> cancelHold(patron, bookOnHold))
                         .map(this::handleResult)
@@ -48,11 +48,11 @@ public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.Ca
                         .get());
     }
 
-    private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> handleResult(Either<BookHoldCancelingFailed, BookHoldCanceled> result) {
+    private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookHoldCancelingFailed, BookHoldCanceled> result) {
         return result
                 .map(bookHoldCanceled -> handlePatronEvent.handle(bookHoldCanceled)
                         .map(patron -> handlePatronEventInLibrary.handle(bookHoldCanceled)
-                                .map(catalogueBookInstanceUUID -> Tuple.of((PatronEvent) bookHoldCanceled, patron, catalogueBookInstanceUUID)))
+                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookHoldCanceled, patron, catalogueBookInstanceId)))
                         .get())
                 .getOrElseGet(bookHoldCancelingFailed -> Try.success(Tuple.of(bookHoldCancelingFailed, null, null)));
     }
@@ -68,7 +68,7 @@ public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.Ca
     public static class CancelHoldCommand {
         @NonNull Instant timestamp;
         @NonNull PatronId patronId;
-        @NonNull CatalogueBookInstanceUUID catalogueBookInstanceUUID;
+        @NonNull CatalogueBookInstanceId catalogueBookInstanceId;
     }
 }
 

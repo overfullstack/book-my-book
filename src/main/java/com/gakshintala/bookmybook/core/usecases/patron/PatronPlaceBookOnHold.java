@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.core.usecases.patron;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.patron.HoldDuration;
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
@@ -25,15 +25,15 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
-public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.PlaceOnHoldCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>>> {
+public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.PlaceOnHoldCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>>> {
     private final FindAvailableBook findAvailableBook;
     private final FindPatron findPatron;
     private final HandlePatronEvent handlePatronEvent;
     private final HandlePatronEventInLibrary handlePatronEventInLibrary;
 
     @Override
-    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> execute(@NonNull PlaceOnHoldCommand command) {
-        return findAvailableBook.findAvailableBook(command.getCatalogueBookInstanceUUID())
+    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull PlaceOnHoldCommand command) {
+        return findAvailableBook.findAvailableBook(command.getCatalogueBookInstanceId())
                 .map(availableBook -> findPatron.findBy(command.getPatronId())
                         .map(patron -> patron.canPatronPlaceOnHold(availableBook, command.getHoldDuration()))
                         .map(this::handleResult)
@@ -41,11 +41,11 @@ public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.Plac
                         .get());
     }
 
-    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> handleResult(Either<BookHoldFailed, BookPlacedOnHold> result) {
+    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookHoldFailed, BookPlacedOnHold> result) {
         return result
                 .map(bookPlacedOnHold -> handlePatronEvent.handle(bookPlacedOnHold)
                         .map(patron -> handlePatronEventInLibrary.handle(bookPlacedOnHold)
-                                .map(catalogueBookInstanceUUID -> Tuple.of((PatronEvent) bookPlacedOnHold, patron, catalogueBookInstanceUUID)))
+                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookPlacedOnHold, patron, catalogueBookInstanceId)))
                         .get())
                 .getOrElseGet(bookHoldFailed -> Try.success(Tuple.of(bookHoldFailed, null, null)));
     }
@@ -54,14 +54,14 @@ public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.Plac
     public static class PlaceOnHoldCommand {
         @NonNull Instant timestamp;
         @NonNull PatronId patronId;
-        @NonNull CatalogueBookInstanceUUID catalogueBookInstanceUUID;
+        @NonNull CatalogueBookInstanceId catalogueBookInstanceId;
         @NonNull HoldDuration holdDuration;
 
-        public static PlaceOnHoldCommand closeEnded(PatronId patronId, CatalogueBookInstanceUUID bookId, int days) {
+        public static PlaceOnHoldCommand closeEnded(PatronId patronId, CatalogueBookInstanceId bookId, int days) {
             return new PlaceOnHoldCommand(Instant.now(), patronId, bookId, HoldDuration.forNoOfDays(days));
         }
 
-        public static PlaceOnHoldCommand openEnded(PatronId patronId, CatalogueBookInstanceUUID bookId) {
+        public static PlaceOnHoldCommand openEnded(PatronId patronId, CatalogueBookInstanceId bookId) {
             return new PlaceOnHoldCommand(Instant.now(), patronId, bookId, HoldDuration.openEnded());
         }
     }

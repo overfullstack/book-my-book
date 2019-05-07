@@ -11,9 +11,9 @@ public class CatalogueBookInstance {
     @NonNull
     ISBN bookIsbn;
     @NonNull
-    CatalogueBookInstanceUUID catalogueBookInstanceUUID;
+    CatalogueBookInstanceId catalogueBookInstanceId;
 
     public static CatalogueBookInstance instanceOf(CatalogueBook catalogueBook) {
-        return new CatalogueBookInstance(catalogueBook.getBookIsbn(), new CatalogueBookInstanceUUID(UUID.randomUUID()));
+        return new CatalogueBookInstance(catalogueBook.getBookIsbn(), new CatalogueBookInstanceId(UUID.randomUUID()));
     }
 }

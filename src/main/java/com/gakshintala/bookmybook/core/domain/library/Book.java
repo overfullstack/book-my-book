@@ -1,12 +1,12 @@
 package com.gakshintala.bookmybook.core.domain.library;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 
 public interface Book {
 
-    default CatalogueBookInstanceUUID bookId() {
-        return getBookInformation().getCatalogueBookInstanceUUID();
+    default CatalogueBookInstanceId bookId() {
+        return getBookInformation().getCatalogueBookInstanceId();
     }
 
     default BookType type() {

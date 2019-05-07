@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.core.domain.patron;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import io.vavr.control.Option;
 import lombok.NonNull;
@@ -46,7 +46,7 @@ public interface PatronEvent {
         @NonNull Instant holdFrom;
         Instant holdTill;
 
-        public static BookPlacedOnHoldNow bookPlacedOnHoldNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType,
+        public static BookPlacedOnHoldNow bookPlacedOnHoldNow(CatalogueBookInstanceId catalogueBookId, BookType bookType,
                                                               LibraryBranchId libraryBranchId, PatronId patronId, HoldDuration holdDuration) {
             return new BookPlacedOnHoldNow(
                     Instant.now(),
@@ -101,7 +101,7 @@ public interface PatronEvent {
         @NonNull UUID libraryBranchId;
         @NonNull Instant till;
 
-        public static BookCollected bookCollectedNow(CatalogueBookInstanceUUID catalogueBookId, BookType bookType,
+        public static BookCollected bookCollectedNow(CatalogueBookInstanceId catalogueBookId, BookType bookType,
                                                      LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
             return new BookCollected(
                     Instant.now(),
@@ -132,7 +132,7 @@ public interface PatronEvent {
         @NonNull UUID bookId;
         UUID libraryBranchId;
 
-        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId,
+        public static BookHoldFailed bookHoldFailedNow(Rejection rejection, CatalogueBookInstanceId catalogueBookId,
                                                        UUID libraryBranchId, PatronId patronId) {
             return new BookHoldFailed(
                     rejection.getReason().getReason(),
@@ -152,7 +152,7 @@ public interface PatronEvent {
         @NonNull UUID bookId;
         UUID libraryBranchId;
 
-        public static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
+        public static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, CatalogueBookInstanceId catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookCollectingFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
@@ -170,7 +170,7 @@ public interface PatronEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        public static BookHoldCanceled holdCanceledNow(CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
+        public static BookHoldCanceled holdCanceledNow(CatalogueBookInstanceId catalogueBookId, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookHoldCanceled(
                     Instant.now(),
                     patronId.getPatronId(),
@@ -188,7 +188,7 @@ public interface PatronEvent {
         UUID libraryBranchId;
         @NonNull String reason;
 
-        public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceUUID catalogueBookId,
+        public static BookHoldCancelingFailed holdCancelingFailedNow(CatalogueBookInstanceId catalogueBookId,
                                                                      LibraryBranchId libraryBranchId, PatronId patronId,
                                                                      Rejection rejection) {
             return new BookHoldCancelingFailed(
@@ -209,7 +209,7 @@ public interface PatronEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        public static BookHoldExpired now(CatalogueBookInstanceUUID catalogueBookId, PatronId patronId, LibraryBranchId libraryBranchId) {
+        public static BookHoldExpired now(CatalogueBookInstanceId catalogueBookId, PatronId patronId, LibraryBranchId libraryBranchId) {
             return new BookHoldExpired(
                     Instant.now(),
                     patronId.getPatronId(),
@@ -226,7 +226,7 @@ public interface PatronEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        public static OverdueCheckoutRegistered now(PatronId patronId, CatalogueBookInstanceUUID catalogueBookId, LibraryBranchId libraryBranchId) {
+        public static OverdueCheckoutRegistered now(PatronId patronId, CatalogueBookInstanceId catalogueBookId, LibraryBranchId libraryBranchId) {
             return new OverdueCheckoutRegistered(
                     Instant.now(),
                     patronId.getPatronId(),

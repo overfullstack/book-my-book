@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.core.domain.library;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;
@@ -34,8 +34,8 @@ public class BookOnHold implements Book {
     @NonNull
     Version version;
 
-    public BookOnHold(CatalogueBookInstanceUUID catalogueBookInstanceUUID, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Instant holdTill, Version version) {
-        this(new BookInformation(catalogueBookInstanceUUID, type), libraryBranchId, patronId, holdTill, version);
+    public BookOnHold(CatalogueBookInstanceId catalogueBookInstanceId, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Instant holdTill, Version version) {
+        this(new BookInformation(catalogueBookInstanceId, type), libraryBranchId, patronId, holdTill, version);
     }
 
     public AvailableBook mapFrom(BookReturned bookReturned) {
@@ -66,8 +66,8 @@ public class BookOnHold implements Book {
     }
 
 
-    public CatalogueBookInstanceUUID getBookId() {
-        return bookInformation.getCatalogueBookInstanceUUID();
+    public CatalogueBookInstanceId getBookId() {
+        return bookInformation.getCatalogueBookInstanceId();
     }
 
     public boolean by(PatronId patronId) {

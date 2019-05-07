@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.core.usecases.patron
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook
 import com.gakshintala.bookmybook.core.domain.patron.Patron
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent
@@ -15,10 +15,7 @@ import spock.lang.Specification
 
 import static com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold
 import static com.gakshintala.bookmybook.fixtures.BookFixture.*
-import static com.gakshintala.bookmybook.fixtures.PatronFixture.anyPatron
-import static com.gakshintala.bookmybook.fixtures.PatronFixture.anyPatronId
-import static com.gakshintala.bookmybook.fixtures.PatronFixture.regularPatron
-import static com.gakshintala.bookmybook.fixtures.PatronFixture.researcherPatron
+import static com.gakshintala.bookmybook.fixtures.PatronFixture.*
 
 class PatronPlaceBookOnHoldTest extends Specification {
     Patron regularPatron = regularPatron()
@@ -34,7 +31,7 @@ class PatronPlaceBookOnHoldTest extends Specification {
     
     HandlePatronEvent handlePatronEvent = { patronEvent -> Try.of({ -> regularPatron }) }
     HandlePatronEventInLibrary handlePatronEventInLibrary = { patronEvent ->
-        Try.of({ -> circulatingAvailableBook.getBookInformation().getCatalogueBookInstanceUUID() })
+        Try.of({ -> circulatingAvailableBook.getBookInformation().getCatalogueBookInstanceId() })
     }
 
     def 'should successfully place on hold book if patron and book exist'() {
@@ -43,7 +40,7 @@ class PatronPlaceBookOnHoldTest extends Specification {
                 handlePatronEvent, handlePatronEventInLibrary)
         
         when:
-        Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
+        Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
         
         then:
         result.isSuccess()
@@ -60,7 +57,7 @@ class PatronPlaceBookOnHoldTest extends Specification {
                 handlePatronEvent, handlePatronEventInLibrary)
         
         when:
-        Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
+        Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
         
         then:
         result.isSuccess()
@@ -73,7 +70,7 @@ class PatronPlaceBookOnHoldTest extends Specification {
                 handlePatronEvent, handlePatronEventInLibrary)
         
         when:
-        Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
+        Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> result = patronPlaceBookOnHold.execute(for3days(anyPatron()))
         
         then:
         result.isSuccess()

@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.core.usecases.compound;
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.patron.HoldDuration;
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
@@ -20,13 +20,13 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
-public class PlaceBookOnHoldCompound implements UseCase<PlaceBookOnHoldCompound.PlaceOnHoldCompoundCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>>> {
+public class PlaceBookOnHoldCompound implements UseCase<PlaceBookOnHoldCompound.PlaceOnHoldCompoundCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>>> {
     private final AddBookEverywhere addBookEverywhere;
     private final CreatePatron createPatron;
     private final PatronPlaceBookOnHold placeBookOnHold;
 
     @Override
-    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> execute(@NonNull PlaceBookOnHoldCompound.PlaceOnHoldCompoundCommand command) {
+    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull PlaceBookOnHoldCompound.PlaceOnHoldCompoundCommand command) {
         return addBookEverywhere.execute(command.getAddBookEverywhereCommand())
                 .map(tuple2 -> createPatron.execute(command.createPatronCommand)
                         .map(patron -> patron.canPatronPlaceOnHold(tuple2._2, command.holdDuration))

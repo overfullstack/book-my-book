@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.core.usecases.patron;
 
 
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
 import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.patron.CheckoutDuration;
@@ -10,11 +10,11 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollectingFailed;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
+import com.gakshintala.bookmybook.core.ports.UseCase;
 import com.gakshintala.bookmybook.core.ports.repositories.library.FindBookOnHold;
 import com.gakshintala.bookmybook.core.ports.repositories.library.HandlePatronEventInLibrary;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.FindPatron;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.HandlePatronEvent;
-import com.gakshintala.bookmybook.core.ports.UseCase;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.control.Either;
@@ -34,15 +34,15 @@ import static io.vavr.control.Either.right;
 
 @Service
 @RequiredArgsConstructor
-public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.CollectBookCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>>> {
+public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.CollectBookCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>>> {
     private final FindBookOnHold findBookOnHold;
     private final FindPatron findPatron;
     private final HandlePatronEvent handlePatronEvent;
     private final HandlePatronEventInLibrary handlePatronEventInLibrary;
 
     @Override
-    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> execute(@NonNull CollectBookCommand command) {
-        return findBookOnHold.findBookOnHold(command.getCatalogueBookInstanceUUID())
+    public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull CollectBookCommand command) {
+        return findBookOnHold.findBookOnHold(command.getCatalogueBookInstanceId())
                 .map(bookOnHold -> findPatron.findBy(command.getPatronId())
                         .map(patron -> collect(patron, bookOnHold, command.getCheckoutDuration()))
                         .map(this::handleResult)
@@ -50,11 +50,11 @@ public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.
                         .get());
     }
 
-    private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> handleResult(Either<BookCollectingFailed, BookCollected> result) {
+    private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookCollectingFailed, BookCollected> result) {
         return result
                 .map(bookCollected -> handlePatronEvent.handle(bookCollected)
                         .map(patron -> handlePatronEventInLibrary.handle(bookCollected)
-                                .map(catalogueBookInstanceUUID -> Tuple.of((PatronEvent) bookCollected, patron, catalogueBookInstanceUUID)))
+                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookCollected, patron, catalogueBookInstanceId)))
                         .get())
                 .getOrElseGet(bookCollectingFailed -> Try.success(Tuple.of(bookCollectingFailed, null, null)));
     }
@@ -71,7 +71,7 @@ public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.
         @NonNull Instant timestamp;
         @NonNull PatronId patronId;
         @NonNull LibraryBranchId libraryId;
-        @NonNull CatalogueBookInstanceUUID catalogueBookInstanceUUID;
+        @NonNull CatalogueBookInstanceId catalogueBookInstanceId;
         @NonNull CheckoutDuration checkoutDuration;
     }
 }

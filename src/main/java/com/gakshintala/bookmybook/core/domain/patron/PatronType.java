@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @ToString
 public enum PatronType {
-    Researcher, Regular;
+    RESEARCHER, REGULAR;
 
     @JsonCreator
     public static PatronType fromString(String patronType) {

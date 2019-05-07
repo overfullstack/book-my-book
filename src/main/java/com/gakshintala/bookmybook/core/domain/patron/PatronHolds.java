@@ -1,10 +1,9 @@
 package com.gakshintala.bookmybook.core.domain.patron;
 
 import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
+import io.vavr.collection.Set;
 import lombok.NonNull;
 import lombok.Value;
-
-import io.vavr.collection.Set;
 
 @Value
 public class PatronHolds {
@@ -22,7 +21,7 @@ public class PatronHolds {
         return resourcesOnHold.size();
     }
 
-    public boolean maximumHoldsAfterHolding() {
+    boolean maximumHoldsAfterHolding() {
         return count() + 1 == MAX_NUMBER_OF_HOLDS;
     }
 }

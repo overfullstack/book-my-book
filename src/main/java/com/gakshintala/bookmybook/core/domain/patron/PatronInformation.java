@@ -3,7 +3,7 @@ package com.gakshintala.bookmybook.core.domain.patron;
 import lombok.NonNull;
 import lombok.Value;
 
-import static com.gakshintala.bookmybook.core.domain.patron.PatronType.Regular;
+import static com.gakshintala.bookmybook.core.domain.patron.PatronType.REGULAR;
 
 @Value
 public class PatronInformation {
@@ -13,7 +13,7 @@ public class PatronInformation {
     @NonNull PatronType type;
 
     boolean isRegular() {
-        return type.equals(Regular);
+        return REGULAR.equals(type);
     }
     
 }

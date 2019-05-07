@@ -4,7 +4,7 @@ import com.gakshintala.bookmybook.adapters.db.CatalogueBookDomainMapper;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookId;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstance;
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.catalogue.ISBN;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.FindCatalogueBook;
 import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistBookInstance;
@@ -50,18 +50,18 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
     }
 
     @Override
-    public Try<CatalogueBookInstanceUUID> persist(CatalogueBookInstance catalogueBookInstance) {
+    public Try<CatalogueBookInstanceId> persist(CatalogueBookInstance catalogueBookInstance) {
         Function<JdbcTemplate, UnaryOperator<KeyHolder>> persistBookInstance = jdbc -> keyHolder -> {
             jdbc.update(connection -> {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CATALOGUE_BOOK_INSTANCE_SQL, Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setString(1, catalogueBookInstance.getBookIsbn().getIsbn());
-                preparedStatement.setObject(2, catalogueBookInstance.getCatalogueBookInstanceUUID().getBookInstanceUUID().toString());
+                preparedStatement.setObject(2, catalogueBookInstance.getCatalogueBookInstanceId().getBookInstanceUUID().toString());
                 return preparedStatement;
             }, keyHolder);
             return keyHolder;
         };
         return DBUtils.insertAndGetGeneratedKey(persistBookInstance, jdbcTemplate)
-                .map(ignore -> catalogueBookInstance.getCatalogueBookInstanceUUID());
+                .map(ignore -> catalogueBookInstance.getCatalogueBookInstanceId());
     }
 
     @Override

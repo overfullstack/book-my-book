@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.adapters.rest.patron.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollectingFailed;
@@ -21,9 +21,9 @@ import static io.vavr.Predicates.instanceOf;
 public class PatronEventResponse {
     private final Boolean success;
     private final String message;
-    private final Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID> holdInfo;
+    private final Tuple3<PatronEvent, Patron, CatalogueBookInstanceId> holdInfo;
 
-    public static PatronEventResponse fromResult(Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceUUID>> result) {
+    public static PatronEventResponse fromResult(Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> result) {
         return result
                 .map(tuple3 -> Match(tuple3._1()).of(
                         Case($(instanceOf(BookHoldFailed.class)), () -> new PatronEventResponse(false, "Hold Failed", tuple3)),

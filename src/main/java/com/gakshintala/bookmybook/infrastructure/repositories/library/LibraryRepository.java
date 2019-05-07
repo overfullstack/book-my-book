@@ -2,7 +2,7 @@ package com.gakshintala.bookmybook.infrastructure.repositories.library;
 
 import com.gakshintala.bookmybook.adapters.db.BookDomainMapper;
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
-import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceUUID;
+import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
 import com.gakshintala.bookmybook.core.domain.library.Book;
 import com.gakshintala.bookmybook.core.domain.library.BookOnHold;
@@ -12,8 +12,8 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronEvent;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;
-import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
+import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookReturned;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.ports.repositories.library.FindAvailableBook;
@@ -93,17 +93,31 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
                 .orElse(() -> insertNew(book));
     }
 
-    private Try<Tuple2<LibraryBookId, Book>> queryBookBy(CatalogueBookInstanceUUID catalogueBookInstanceUUID) {
-        return queryBy(catalogueBookInstanceUUID)
-                .map(BookDomainMapper::toDomainModel);
+    private Function<JdbcTemplate, UnaryOperator<KeyHolder>> insert(CatalogueBookInstanceId catalogueBookInstanceId,
+                                                                    BookType bookType, BookState state,
+                                                                    UUID availableAt, UUID onHoldAt, UUID onHoldBy,
+                                                                    Instant onHoldTill, UUID collectedAt, UUID collectedBy) {
+        return jdbc -> keyHolder -> {
+            jdbc.update(connection -> {
+                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_BOOK_IN_LIBRARY_SQL, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setObject(1, catalogueBookInstanceId.getBookInstanceUUID(), Types.OTHER);
+                preparedStatement.setString(2, bookType.toString());
+                preparedStatement.setString(3, state.toString());
+                preparedStatement.setObject(4, availableAt, Types.OTHER);
+                preparedStatement.setObject(5, onHoldAt, Types.OTHER);
+                preparedStatement.setObject(6, onHoldBy, Types.OTHER);
+                preparedStatement.setObject(7, collectedAt, Types.OTHER);
+                preparedStatement.setObject(8, collectedBy, Types.OTHER);
+                preparedStatement.setObject(9, onHoldTill, Types.OTHER);
+                return preparedStatement;
+            }, keyHolder);
+            return keyHolder;
+        };
     }
 
-    private Try<BookDatabaseEntity> queryBy(CatalogueBookInstanceUUID catalogueBookInstanceUUID) {
-        return Try.of(() ->
-                Option(jdbcTemplate.queryForObject("SELECT b.* FROM book_database_entity b WHERE b.book_id = ?",
-                        new BeanPropertyRowMapper<>(BookDatabaseEntity.class), catalogueBookInstanceUUID.getBookInstanceUUID()))
-                        .getOrElseThrow(() -> new IllegalArgumentException("No Book found with Id: " + catalogueBookInstanceUUID))
-        );
+    @Override
+    public Try<AvailableBook> findAvailableBook(CatalogueBookInstanceId catalogueBookInstanceId) {
+        return findBookWithType(catalogueBookInstanceId, AvailableBook.class);
     }
 
     private Try<Integer> updateOptimistically(Book book) {
@@ -130,26 +144,12 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
                 availableBook.getLibraryBranchId().getLibraryBranchUUID(), null, null, null, null, null);
     }
 
-    private Function<JdbcTemplate, UnaryOperator<KeyHolder>> insert(CatalogueBookInstanceUUID catalogueBookInstanceUUID,
-                                                                    BookType bookType, BookState state,
-                                                                    UUID availableAt, UUID onHoldAt, UUID onHoldBy,
-                                                                    Instant onHoldTill, UUID collectedAt, UUID collectedBy) {
-        return jdbc -> keyHolder -> {
-            jdbc.update(connection -> {
-                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_BOOK_IN_LIBRARY_SQL, Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setObject(1, catalogueBookInstanceUUID.getBookInstanceUUID(), Types.OTHER);
-                preparedStatement.setString(2, bookType.toString());
-                preparedStatement.setString(3, state.toString());
-                preparedStatement.setObject(4, availableAt, Types.OTHER);
-                preparedStatement.setObject(5, onHoldAt, Types.OTHER);
-                preparedStatement.setObject(6, onHoldBy, Types.OTHER);
-                preparedStatement.setObject(7, collectedAt, Types.OTHER);
-                preparedStatement.setObject(8, collectedBy, Types.OTHER);
-                preparedStatement.setObject(9, onHoldTill, Types.OTHER);
-                return preparedStatement;
-            }, keyHolder);
-            return keyHolder;
-        };
+    private <T extends Book> Try<T> findBookWithType(CatalogueBookInstanceId catalogueBookInstanceId, Class<T> bookType) {
+        return queryBookBy(catalogueBookInstanceId)
+                .map(Tuple2::_2)
+                .map(book -> Match(book).of(
+                        Case($(instanceOf(bookType)), Function.identity())
+                ));
     }
 
     private Function<JdbcTemplate, UnaryOperator<KeyHolder>> insert(BookOnHold bookOnHold) {
@@ -162,26 +162,26 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
                 null, null, collectedBook.getCollectedAt().getLibraryBranchUUID(), collectedBook.getByPatron().getPatronId());
     }
 
-    @Override
-    public Try<AvailableBook> findAvailableBook(CatalogueBookInstanceUUID catalogueBookInstanceUUID) {
-        return findBookWithType(catalogueBookInstanceUUID, AvailableBook.class);
+    private Try<Tuple2<LibraryBookId, Book>> queryBookBy(CatalogueBookInstanceId catalogueBookInstanceId) {
+        return queryBy(catalogueBookInstanceId)
+                .map(BookDomainMapper::toDomainModel);
     }
 
-    private <T extends Book> Try<T> findBookWithType(CatalogueBookInstanceUUID catalogueBookInstanceUUID, Class<T> bookType) {
-        return queryBookBy(catalogueBookInstanceUUID)
-                        .map(Tuple2::_2)
-                        .map(book -> Match(book).of(
-                                Case($(instanceOf(bookType)), Function.identity())
-                        ));
-    }
-
-    @Override
-    public Try<BookOnHold> findBookOnHold(CatalogueBookInstanceUUID catalogueBookInstanceUUID) {
-        return findBookWithType(catalogueBookInstanceUUID, BookOnHold.class);
+    private Try<BookDatabaseEntity> queryBy(CatalogueBookInstanceId catalogueBookInstanceId) {
+        return Try.of(() ->
+                Option(jdbcTemplate.queryForObject("SELECT b.* FROM book_database_entity b WHERE b.book_id = ?",
+                        new BeanPropertyRowMapper<>(BookDatabaseEntity.class), catalogueBookInstanceId.getBookInstanceUUID()))
+                        .getOrElseThrow(() -> new IllegalArgumentException("No Book found with Id: " + catalogueBookInstanceId))
+        );
     }
 
     @Override
-    public Try<CatalogueBookInstanceUUID> handle(PatronEvent event) {
+    public Try<BookOnHold> findBookOnHold(CatalogueBookInstanceId catalogueBookInstanceId) {
+        return findBookWithType(catalogueBookInstanceId, BookOnHold.class);
+    }
+
+    @Override
+    public Try<CatalogueBookInstanceId> handle(PatronEvent event) {
         return Match(event).of(
                 Case($(instanceOf(BookPlacedOnHold.class)), this::handle),
                 Case($(instanceOf(BookPlacedOnHoldNow.class)), this::handle),
@@ -192,43 +192,43 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
         );
     }
 
-    private Try<CatalogueBookInstanceUUID> handle(BookPlacedOnHold bookPlacedOnHold) {
+    private Try<CatalogueBookInstanceId> handle(BookPlacedOnHold bookPlacedOnHold) {
         return this.handle(bookPlacedOnHold.getBookPlacedOnHoldNow());
     }
 
-    private Try<CatalogueBookInstanceUUID> handle(BookPlacedOnHoldNow bookPlacedOnHoldNow) {
-        return queryBookBy(new CatalogueBookInstanceUUID(bookPlacedOnHoldNow.getBookId()))
+    private Try<CatalogueBookInstanceId> handle(BookPlacedOnHoldNow bookPlacedOnHoldNow) {
+        return queryBookBy(new CatalogueBookInstanceId(bookPlacedOnHoldNow.getBookId()))
                 .map(book -> handleBookPlacedOnHold(book._2, bookPlacedOnHoldNow)
                         .map(this::updateOptimistically))
-                .map(ignore -> new CatalogueBookInstanceUUID(bookPlacedOnHoldNow.getBookId()));
+                .map(ignore -> new CatalogueBookInstanceId(bookPlacedOnHoldNow.getBookId()));
     }
 
-    private Try<CatalogueBookInstanceUUID> handle(BookCollected bookCollected) {
-        return queryBookBy(new CatalogueBookInstanceUUID(bookCollected.getBookId()))
+    private Try<CatalogueBookInstanceId> handle(BookCollected bookCollected) {
+        return queryBookBy(new CatalogueBookInstanceId(bookCollected.getBookId()))
                 .map(book -> handleBookCollected(book._2, bookCollected))
                 .map(this::updateOptimistically)
-                .map(ignore -> new CatalogueBookInstanceUUID(bookCollected.getBookId()));
+                .map(ignore -> new CatalogueBookInstanceId(bookCollected.getBookId()));
     }
 
-    private Try<CatalogueBookInstanceUUID> handle(BookHoldExpired holdExpired) {
-        return queryBookBy(new CatalogueBookInstanceUUID(holdExpired.getBookId()))
+    private Try<CatalogueBookInstanceId> handle(BookHoldExpired holdExpired) {
+        return queryBookBy(new CatalogueBookInstanceId(holdExpired.getBookId()))
                 .map(book -> handleBookHoldExpired(book._2, holdExpired))
                 .map(this::updateOptimistically)
-                .map(ignore -> new CatalogueBookInstanceUUID(holdExpired.getBookId()));
+                .map(ignore -> new CatalogueBookInstanceId(holdExpired.getBookId()));
     }
 
-    private Try<CatalogueBookInstanceUUID> handle(BookHoldCanceled holdCanceled) {
-        return queryBookBy(new CatalogueBookInstanceUUID(holdCanceled.getBookId()))
+    private Try<CatalogueBookInstanceId> handle(BookHoldCanceled holdCanceled) {
+        return queryBookBy(new CatalogueBookInstanceId(holdCanceled.getBookId()))
                 .map(book -> handleBookHoldCanceled(book._2, holdCanceled))
                 .map(this::updateOptimistically)
-                .map(ignore -> new CatalogueBookInstanceUUID(holdCanceled.getBookId()));
+                .map(ignore -> new CatalogueBookInstanceId(holdCanceled.getBookId()));
     }
 
-    private Try<CatalogueBookInstanceUUID> handle(BookReturned bookReturned) {
-        return queryBookBy(new CatalogueBookInstanceUUID(bookReturned.getBookId()))
+    private Try<CatalogueBookInstanceId> handle(BookReturned bookReturned) {
+        return queryBookBy(new CatalogueBookInstanceId(bookReturned.getBookId()))
                 .map(book -> handleBookReturned(book._2, bookReturned))
                 .map(this::updateOptimistically)
-                .map(ignore -> new CatalogueBookInstanceUUID(bookReturned.getBookId()));
+                .map(ignore -> new CatalogueBookInstanceId(bookReturned.getBookId()));
     }
 
     private Option<? extends Book> handleBookPlacedOnHold(Book book, BookPlacedOnHoldNow bookPlacedOnHoldNow) {

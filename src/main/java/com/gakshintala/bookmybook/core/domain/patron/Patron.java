@@ -60,7 +60,6 @@ public class Patron {
 
     private Option<Rejection> validateCanPatronPlaceOnHold(AvailableBook availableBook, HoldDuration forDuration) {
         return placingOnHoldPolicies
-                .toStream()
                 .map(policy -> policy.apply(availableBook, this, forDuration))
                 .find(Either::isLeft)
                 .map(Either::getLeft);
