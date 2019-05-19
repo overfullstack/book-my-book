@@ -2,7 +2,6 @@ package com.gakshintala.bookmybook.core.domain.patron;
 
 
 import com.gakshintala.bookmybook.core.domain.library.AvailableBook;
-import com.gakshintala.bookmybook.core.domain.library.LibraryBranchId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldFailed;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
@@ -27,9 +26,6 @@ public class Patron {
 
     @NonNull
     List<PlacingOnHoldPolicy> placingOnHoldPolicies;
-
-    @NonNull
-    OverdueCheckouts overdueCheckouts;
 
     @NonNull
     PatronHolds patronHolds;
@@ -67,10 +63,6 @@ public class Patron {
 
     boolean isRegular() {
         return patronInformation.isRegular();
-    }
-
-    int overdueCheckoutsAt(LibraryBranchId libraryBranch) {
-        return overdueCheckouts.countAt(libraryBranch);
     }
 
     int numberOfHolds() {

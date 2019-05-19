@@ -16,9 +16,9 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import lombok.experimental.UtilityClass;
 
-import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.Available;
-import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.Collected;
-import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.OnHold;
+import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.AVAILABLE;
+import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.COLLECTED;
+import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.ON_HOLD;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 
@@ -30,9 +30,9 @@ public class BookDomainMapper {
 
     private static Tuple2<LibraryBookId, Book> toDomainModelWithState(BookDatabaseEntity bookDatabaseEntity, BookState bookState) {
         return Tuple.of(new LibraryBookId(bookDatabaseEntity.getId()), Match(bookState).of(
-                Case(API.$(Available), () -> toAvailableBook(bookDatabaseEntity)),
-                Case(API.$(OnHold), () -> toBookOnHold(bookDatabaseEntity)),
-                Case(API.$(Collected), () -> toCollectedBook(bookDatabaseEntity))
+                Case(API.$(AVAILABLE), () -> toAvailableBook(bookDatabaseEntity)),
+                Case(API.$(ON_HOLD), () -> toBookOnHold(bookDatabaseEntity)),
+                Case(API.$(COLLECTED), () -> toCollectedBook(bookDatabaseEntity))
         ));
     }
 

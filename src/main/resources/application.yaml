@@ -3,6 +3,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+  main:
+    allow-bean-definition-overriding: true
 
   datasource:
     url: jdbc:h2:mem:elibdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
@@ -14,7 +16,9 @@ server:
 logging:
   level:
     org.springframework.web: INFO
-    org.hibernate: ERROR
+    org.hibernate:
+      SQL: debug
+      type: trace
 
 ---
 

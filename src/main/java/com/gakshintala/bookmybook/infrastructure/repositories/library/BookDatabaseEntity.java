@@ -3,9 +3,9 @@ package com.gakshintala.bookmybook.infrastructure.repositories.library;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.BookType;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
@@ -13,14 +13,14 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "book_database_entity")
-@NoArgsConstructor
 public class BookDatabaseEntity {
 
-    public enum BookState {
-        Available, OnHold, Collected
-    }
-    
+    @Id
     int id;
+    
+    public enum BookState {
+        AVAILABLE, ON_HOLD, COLLECTED
+    }
     UUID book_id;
     BookType book_type;
     BookState book_state;

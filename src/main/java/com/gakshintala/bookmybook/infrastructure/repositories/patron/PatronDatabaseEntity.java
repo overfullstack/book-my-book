@@ -9,10 +9,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.UUID;
 
 @Data
@@ -23,17 +28,20 @@ import java.util.UUID;
 @Table(name = "patron_database_entity")
 public class PatronDatabaseEntity {
     @Id
-    Long id;
-    UUID patronId;
-    PatronType patronType;
-    Set<HoldDatabaseEntity> booksOnHold;
-    Set<OverdueCheckoutDatabaseEntity> checkouts;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private UUID patronId;
+    @Enumerated(EnumType.STRING)
+    private PatronType patronType;
+    /*@ElementCollection
+    @CollectionTable(name = "hold_database_entity", joinColumns = @JoinColumn(name = "patron_database_entity"))*/
+    @Transient
+    private Set<HoldDatabaseEntity> booksOnHold;
 
     PatronDatabaseEntity(PatronId patronId, PatronType patronType) {
         this.patronId = patronId.getPatronId();
         this.patronType = patronType;
-        this.booksOnHold = HashSet.empty();
-        this.checkouts = HashSet.empty();
+        booksOnHold = HashSet.empty();
     }
 }
 

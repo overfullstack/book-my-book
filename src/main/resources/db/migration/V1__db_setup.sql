@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS catalogue_book
 );
 CREATE SEQUENCE catalogue_book_seq;
 
+
 CREATE TABLE IF NOT EXISTS catalogue_book_instance
 (
     id      INTEGER IDENTITY PRIMARY KEY,
@@ -36,8 +37,8 @@ CREATE SEQUENCE book_database_entity_seq;
 CREATE TABLE IF NOT EXISTS patron_database_entity
 (
     id          INTEGER IDENTITY PRIMARY KEY,
-    patron_type VARCHAR(100) NOT NULL,
-    patron_id   UUID UNIQUE
+    patron_id   UUID UNIQUE,
+    patron_type VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS hold_database_entity

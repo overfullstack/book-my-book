@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Data
@@ -11,6 +12,7 @@ import javax.persistence.Table;
 @Table(name = "catalogue_book")
 @NoArgsConstructor
 public class CatalogueBookDatabaseEntity {
+    @Id
     String isbn;
     String author;
     String title;

@@ -114,16 +114,6 @@ public interface PatronEvent {
     }
 
     @Value
-    class BookReturned implements PatronEvent {
-        @NonNull UUID eventId = UUID.randomUUID();
-        @NonNull Instant when;
-        @NonNull UUID patronId;
-        @NonNull UUID bookId;
-        @NonNull BookType bookType;
-        @NonNull UUID libraryBranchId;
-    }
-
-    @Value
     class BookHoldFailed implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull String reason;
@@ -211,23 +201,6 @@ public interface PatronEvent {
 
         public static BookHoldExpired now(CatalogueBookInstanceId catalogueBookId, PatronId patronId, LibraryBranchId libraryBranchId) {
             return new BookHoldExpired(
-                    Instant.now(),
-                    patronId.getPatronId(),
-                    catalogueBookId.getBookInstanceUUID(),
-                    libraryBranchId.getLibraryBranchUUID());
-        }
-    }
-
-    @Value
-    class OverdueCheckoutRegistered implements PatronEvent {
-        @NonNull UUID eventId = UUID.randomUUID();
-        @NonNull Instant when;
-        @NonNull UUID patronId;
-        @NonNull UUID bookId;
-        @NonNull UUID libraryBranchId;
-
-        public static OverdueCheckoutRegistered now(PatronId patronId, CatalogueBookInstanceId catalogueBookId, LibraryBranchId libraryBranchId) {
-            return new OverdueCheckoutRegistered(
                     Instant.now(),
                     patronId.getPatronId(),
                     catalogueBookId.getBookInstanceUUID(),

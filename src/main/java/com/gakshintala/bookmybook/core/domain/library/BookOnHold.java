@@ -5,7 +5,6 @@ import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookInstanceId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookCollected;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCanceled;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;
-import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookReturned;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -36,12 +35,6 @@ public class BookOnHold implements Book {
 
     public BookOnHold(CatalogueBookInstanceId catalogueBookInstanceId, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Instant holdTill, Version version) {
         this(new BookInformation(catalogueBookInstanceId, type), libraryBranchId, patronId, holdTill, version);
-    }
-
-    public AvailableBook mapFrom(BookReturned bookReturned) {
-        return new AvailableBook(
-                bookInformation, new LibraryBranchId(bookReturned.getLibraryBranchId()),
-                version);
     }
 
     public AvailableBook mapFrom(BookHoldExpired bookHoldExpired) {

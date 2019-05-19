@@ -14,7 +14,6 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCancele
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
-import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookReturned;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.ports.repositories.library.FindAvailableBook;
 import com.gakshintala.bookmybook.core.ports.repositories.library.FindBookOnHold;
@@ -40,9 +39,9 @@ import java.util.function.UnaryOperator;
 
 import static com.gakshintala.bookmybook.infrastructure.repositories.DBUtils.insertAndGetGeneratedKey;
 import static com.gakshintala.bookmybook.infrastructure.repositories.DBUtils.performUpdateOperation;
-import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.Available;
-import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.Collected;
-import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.OnHold;
+import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.AVAILABLE;
+import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.COLLECTED;
+import static com.gakshintala.bookmybook.infrastructure.repositories.library.BookDatabaseEntity.BookState.ON_HOLD;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
@@ -60,14 +59,14 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
     private final JdbcTemplate jdbcTemplate;
     private final Function<AvailableBook, Function<JdbcTemplate, Integer>> updateAvailableBook = availableBook -> jdbc ->
             jdbc.update(UPDATE_AVAILABLE_BOOK_SQL,
-                    Available.toString(),
+                    AVAILABLE.toString(),
                     availableBook.getLibraryBranchId().getLibraryBranchUUID(),
                     availableBook.getVersion().getVersion() + 1,
                     availableBook.getBookInstanceId().getBookInstanceUUID(),
                     availableBook.getVersion().getVersion());
     private final Function<BookOnHold, Function<JdbcTemplate, Integer>> updateBookOnHold = bookOnHold -> jdbc ->
             jdbc.update(UPDATE_BOOK_ON_HOLD_SQL,
-                    OnHold.toString(),
+                    ON_HOLD.toString(),
                     bookOnHold.getHoldPlacedAt().getLibraryBranchUUID(),
                     bookOnHold.getByPatron().getPatronId(),
                     bookOnHold.getHoldTill(),
@@ -76,7 +75,7 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
                     bookOnHold.getVersion().getVersion());
     private final Function<CollectedBook, Function<JdbcTemplate, Integer>> updateCollectedBook = collectedBook -> jdbc ->
             jdbc.update(UPDATE_COLLECTED_BOOK_SQL,
-                    Collected.toString(),
+                    COLLECTED.toString(),
                     collectedBook.getCollectedAt().getLibraryBranchUUID(),
                     collectedBook.getByPatron().getPatronId(),
                     collectedBook.getVersion().getVersion() + 1,
@@ -140,7 +139,7 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
     }
 
     private Function<JdbcTemplate, UnaryOperator<KeyHolder>> insert(AvailableBook availableBook) {
-        return insert(availableBook.getBookInstanceId(), availableBook.type(), Available,
+        return insert(availableBook.getBookInstanceId(), availableBook.type(), AVAILABLE,
                 availableBook.getLibraryBranchId().getLibraryBranchUUID(), null, null, null, null, null);
     }
 
@@ -153,12 +152,12 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
     }
 
     private Function<JdbcTemplate, UnaryOperator<KeyHolder>> insert(BookOnHold bookOnHold) {
-        return insert(bookOnHold.getBookId(), bookOnHold.type(), OnHold, null,
+        return insert(bookOnHold.getBookId(), bookOnHold.type(), ON_HOLD, null,
                 bookOnHold.getHoldPlacedAt().getLibraryBranchUUID(), bookOnHold.getByPatron().getPatronId(), bookOnHold.getHoldTill(), null, null);
     }
 
     private Function<JdbcTemplate, UnaryOperator<KeyHolder>> insert(CollectedBook collectedBook) {
-        return insert(collectedBook.getBookId(), collectedBook.type(), Collected, null, null,
+        return insert(collectedBook.getBookId(), collectedBook.type(), COLLECTED, null, null,
                 null, null, collectedBook.getCollectedAt().getLibraryBranchUUID(), collectedBook.getByPatron().getPatronId());
     }
 
@@ -187,8 +186,7 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
                 Case($(instanceOf(BookPlacedOnHoldNow.class)), this::handle),
                 Case($(instanceOf(BookCollected.class)), this::handle),
                 Case($(instanceOf(BookHoldCanceled.class)), this::handle),
-                Case($(instanceOf(BookHoldExpired.class)), this::handle),
-                Case($(instanceOf(BookReturned.class)), this::handle)
+                Case($(instanceOf(BookHoldExpired.class)), this::handle)
         );
     }
 
@@ -224,13 +222,6 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
                 .map(ignore -> new CatalogueBookInstanceId(holdCanceled.getBookId()));
     }
 
-    private Try<CatalogueBookInstanceId> handle(BookReturned bookReturned) {
-        return queryBookBy(new CatalogueBookInstanceId(bookReturned.getBookId()))
-                .map(book -> handleBookReturned(book._2, bookReturned))
-                .map(this::updateOptimistically)
-                .map(ignore -> new CatalogueBookInstanceId(bookReturned.getBookId()));
-    }
-
     private Option<? extends Book> handleBookPlacedOnHold(Book book, BookPlacedOnHoldNow bookPlacedOnHoldNow) {
         return Match(book).of(
                 Case($(instanceOf(AvailableBook.class)), availableBook -> Option(availableBook.handle(bookPlacedOnHoldNow))),
@@ -261,13 +252,6 @@ class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, Find
     private Book handleBookCollected(Book book, BookCollected bookCollected) {
         return Match(book).of(
                 Case($(instanceOf(BookOnHold.class)), onHold -> onHold.mapFrom(bookCollected)),
-                Case($(), () -> book)
-        );
-    }
-
-    private Book handleBookReturned(Book book, BookReturned bookReturned) {
-        return Match(book).of(
-                Case($(instanceOf(CollectedBook.class)), collected -> collected.handle(bookReturned)),
                 Case($(), () -> book)
         );
     }

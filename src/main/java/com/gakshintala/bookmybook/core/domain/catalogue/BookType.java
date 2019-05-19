@@ -4,7 +4,7 @@ public enum BookType {
     RESTRICTED, CIRCULATING;
     
     public static BookType fromString(String bookType) {
-        return BookType.valueOf(bookType);
+        return BookType.valueOf(bookType.toUpperCase());
     }
 }
 

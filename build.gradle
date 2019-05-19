@@ -1,21 +1,16 @@
 plugins {
-    id 'org.springframework.boot'
-    id 'io.spring.dependency-management'
+    id 'org.springframework.boot' version "2.1.5.RELEASE"
+    id "io.spring.dependency-management" version "1.0.7.RELEASE"
+    id "org.flywaydb.flyway" version "5.2.4"
     id 'java'
     id 'idea'
     id 'war'
-    id "io.freefair.lombok"
+    id "io.freefair.lombok" version "3.5.2"
 }
 
 group = 'com.gakshintala'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '12'
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
 
 repositories {
     mavenCentral()
@@ -23,11 +18,13 @@ repositories {
 
 dependencies {
     compile('io.vavr:vavr:0.10.0')
-    compile group: 'org.springframework.data', name: 'spring-data-jdbc', version: '1.0.6.RELEASE'
+
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.flywaydb:flyway-core'
+
+    compile group: 'org.springframework.data', name: 'spring-data-jdbc', version: '1.0.6.RELEASE'
+
     providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'

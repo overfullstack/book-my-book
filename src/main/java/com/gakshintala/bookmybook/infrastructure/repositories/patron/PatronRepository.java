@@ -9,8 +9,6 @@ import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldCancele
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookHoldExpired;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHold;
 import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookPlacedOnHoldNow;
-import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.BookReturned;
-import com.gakshintala.bookmybook.core.domain.patron.PatronEvent.OverdueCheckoutRegistered;
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronInformation;
 import com.gakshintala.bookmybook.core.ports.repositories.patron.FindPatron;
@@ -33,56 +31,42 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.Predicates.instanceOf;
 
-interface PatronEntityRepository extends CrudRepository<PatronDatabaseEntity, Long> {
-
-    @Query("SELECT p.* FROM patron_database_entity p where p.patron_id = :patronId")
-    PatronDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
-
-}
-
 @Repository
 @RequiredArgsConstructor
 public class PatronRepository implements FindPatron, PersistPatron, HandlePatronEvent {
     private final PatronEntityRepository patronEntityRepository;
 
-    private final Function2<PatronDatabaseEntity, BookPlacedOnHoldNow, PatronDatabaseEntity> handleBookPlacedOnHold = (entity, event) -> {
-        Set<HoldDatabaseEntity> booksOnHold = entity.booksOnHold;
-        booksOnHold.add(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()));
-        return entity.withBooksOnHold(booksOnHold);
-    };
-    private final Function2<PatronDatabaseEntity, BookPlacedOnHold, PatronDatabaseEntity> handleBookPlacedOnHoldEvents = (entity, placedOnHoldEvents) -> {
-        BookPlacedOnHoldNow event = placedOnHoldEvents.getBookPlacedOnHoldNow();
-        return handleBookPlacedOnHold.apply(entity, event);
-    };
+    private final Function2<PatronDatabaseEntity, BookPlacedOnHoldNow, PatronDatabaseEntity> handleBookPlacedOnHoldNow =
+            (entity, event) -> entity
+                    .withBooksOnHold(
+                            entity.getBooksOnHold()
+                                    .add(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill())));
+
+    private final Function2<PatronDatabaseEntity, BookPlacedOnHold, PatronDatabaseEntity> handleBookPlacedOnHold =
+            (entity, placedOnHold) -> handleBookPlacedOnHoldNow.apply(entity, placedOnHold.getBookPlacedOnHoldNow());
+    
     private final Function2<PatronDatabaseEntity, BookCollected, PatronDatabaseEntity> handleBookCollected =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
     private final Function2<PatronDatabaseEntity, BookHoldCanceled, PatronDatabaseEntity> handleBookHoldCanceled =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
     private final Function2<PatronDatabaseEntity, BookHoldExpired, PatronDatabaseEntity> handleBookHoldExpired =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
-    private final Function2<PatronDatabaseEntity, OverdueCheckoutRegistered, PatronDatabaseEntity> handleOverdueCheckoutRegistered =
-            (entity, event) -> entity
-                    .withCheckouts(entity.getCheckouts().add(new OverdueCheckoutDatabaseEntity(
-                            event.getBookId(), event.getPatronId(), event.getLibraryBranchId())));
-    private final Function2<PatronDatabaseEntity, BookReturned, PatronDatabaseEntity> handleBookReturned =
-            (entity, event) -> removeOverdueCheckoutIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
+
     private final Function2<PatronEvent, PatronDatabaseEntity, PatronDatabaseEntity> handle =
             (event, entity) -> API.Match(event).of(
-                    Case($(instanceOf(BookPlacedOnHold.class)), handleBookPlacedOnHoldEvents.curried().apply(entity)),
-                    Case($(instanceOf(BookPlacedOnHoldNow.class)), handleBookPlacedOnHold.curried().apply(entity)),
+                    Case($(instanceOf(BookPlacedOnHold.class)), handleBookPlacedOnHold.curried().apply(entity)),
+                    Case($(instanceOf(BookPlacedOnHoldNow.class)), handleBookPlacedOnHoldNow.curried().apply(entity)),
                     Case($(instanceOf(BookCollected.class)), handleBookCollected.curried().apply(entity)),
                     Case($(instanceOf(BookHoldCanceled.class)), handleBookHoldCanceled.curried().apply(entity)),
-                    Case($(instanceOf(BookHoldExpired.class)), handleBookHoldExpired.curried().apply(entity)),
-                    Case($(instanceOf(OverdueCheckoutRegistered.class)), handleOverdueCheckoutRegistered.curried().apply(entity)),
-                    Case($(instanceOf(BookReturned.class)), handleBookReturned.curried().apply(entity))
+                    Case($(instanceOf(BookHoldExpired.class)), handleBookHoldExpired.curried().apply(entity))
             );
 
     @Override
     public Try<Patron> findBy(PatronId patronId) {
-        return Try.of(() -> 
+        return Try.of(() ->
                 Option.of(patronEntityRepository.findByPatronId(patronId.getPatronId()))
-                .map(PatronDomainModelMapper::toDomainModel)
-                .getOrElseThrow(() -> new IllegalArgumentException("No Patron found with Id: " + patronId))
+                        .map(PatronDomainModelMapper::toDomainModel)
+                        .getOrElseThrow(() -> new IllegalArgumentException("No Patron found with Id: " + patronId))
         );
     }
 
@@ -102,17 +86,18 @@ public class PatronRepository implements FindPatron, PersistPatron, HandlePatron
     }
 
     private PatronDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId, PatronDatabaseEntity entity) {
-        final Set<HoldDatabaseEntity> nonPatronBookHolds = entity.booksOnHold
+        final Set<HoldDatabaseEntity> nonPatronBookHolds = entity.getBooksOnHold()
                 .filter(holdDatabaseEntity -> !holdDatabaseEntity.is(patronId, bookId, libraryBranchId))
                 .toSet();
         return entity.withBooksOnHold(nonPatronBookHolds);
     }
 
-    private PatronDatabaseEntity removeOverdueCheckoutIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId, PatronDatabaseEntity entity) {
-        return entity.withCheckouts(entity.getCheckouts()
-                .filter(overdueCheckoutDatabaseEntity -> overdueCheckoutDatabaseEntity.is(patronId, bookId, libraryBranchId))
-                .toSet());
-    }
+}
+
+interface PatronEntityRepository extends CrudRepository<PatronDatabaseEntity, Long> {
+
+    @Query("SELECT p.* FROM patron_database_entity p where p.patron_id = :patronId")
+    PatronDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
 
 }
 

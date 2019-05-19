@@ -9,6 +9,6 @@ public enum PatronType {
 
     @JsonCreator
     public static PatronType fromString(String patronType) {
-        return PatronType.valueOf(patronType);
+        return PatronType.valueOf(patronType.toUpperCase());
     }
 }

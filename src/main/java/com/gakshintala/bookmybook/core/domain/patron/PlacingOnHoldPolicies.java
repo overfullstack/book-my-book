@@ -16,12 +16,6 @@ public class PlacingOnHoldPolicies {
         }
         return right(new Allowance());
     };
-    public static final PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
-        if (patron.overdueCheckoutsAt(toHold.getLibraryBranchId()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
-            return left(Rejection.withReason("cannot place on hold when there are overdue checkouts"));
-        }
-        return right(new Allowance());
-    };
     public static final PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
         if (patron.isRegular() && patron.numberOfHolds() >= PatronHolds.MAX_NUMBER_OF_HOLDS) {
             return left(Rejection.withReason("patron cannot hold more books"));
@@ -38,7 +32,6 @@ public class PlacingOnHoldPolicies {
     public static List<PlacingOnHoldPolicy> allCurrentPolicies() {
         return List.of(
                 onlyResearcherPatronsCanHoldRestrictedBooksPolicy,
-                overdueCheckoutsRejectionPolicy,
                 regularPatronMaximumNumberOfHoldsPolicy,
                 onlyResearcherPatronsCanPlaceOpenEndedHolds);
     }
