@@ -17,6 +17,7 @@ import com.gakshintala.bookmybook.core.ports.repositories.patron.PersistPatron;
 import io.vavr.API;
 import io.vavr.Function2;
 import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +38,13 @@ public class PatronRepository implements FindPatron, PersistPatron, HandlePatron
     private final PatronEntityRepository patronEntityRepository;
 
     private final Function2<PatronDatabaseEntity, BookPlacedOnHoldNow, PatronDatabaseEntity> handleBookPlacedOnHoldNow =
-            (entity, event) -> entity
-                    .withBooksOnHold(
-                            entity.getBooksOnHold()
-                                    .add(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill())));
+            (entity, event) -> entity.withBooksOnHold(Stream.ofAll(entity.getBooksOnHold())
+                    .append(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()))
+                    .toJavaSet());
 
     private final Function2<PatronDatabaseEntity, BookPlacedOnHold, PatronDatabaseEntity> handleBookPlacedOnHold =
             (entity, placedOnHold) -> handleBookPlacedOnHoldNow.apply(entity, placedOnHold.getBookPlacedOnHoldNow());
-    
+
     private final Function2<PatronDatabaseEntity, BookCollected, PatronDatabaseEntity> handleBookCollected =
             (entity, event) -> removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId(), entity);
     private final Function2<PatronDatabaseEntity, BookHoldCanceled, PatronDatabaseEntity> handleBookHoldCanceled =
@@ -86,10 +86,10 @@ public class PatronRepository implements FindPatron, PersistPatron, HandlePatron
     }
 
     private PatronDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId, PatronDatabaseEntity entity) {
-        final Set<HoldDatabaseEntity> nonPatronBookHolds = entity.getBooksOnHold()
+        final Set<HoldDatabaseEntity> nonPatronBookHolds = Stream.ofAll(entity.getBooksOnHold())
                 .filter(holdDatabaseEntity -> !holdDatabaseEntity.is(patronId, bookId, libraryBranchId))
                 .toSet();
-        return entity.withBooksOnHold(nonPatronBookHolds);
+        return entity.withBooksOnHold(nonPatronBookHolds.toJavaSet());
     }
 
 }

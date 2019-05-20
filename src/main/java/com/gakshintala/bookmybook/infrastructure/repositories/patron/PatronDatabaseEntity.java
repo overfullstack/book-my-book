@@ -3,21 +3,25 @@ package com.gakshintala.bookmybook.infrastructure.repositories.patron;
 
 import com.gakshintala.bookmybook.core.domain.patron.PatronId;
 import com.gakshintala.bookmybook.core.domain.patron.PatronType;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 
+import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -33,15 +37,15 @@ public class PatronDatabaseEntity {
     private UUID patronId;
     @Enumerated(EnumType.STRING)
     private PatronType patronType;
-    /*@ElementCollection
-    @CollectionTable(name = "hold_database_entity", joinColumns = @JoinColumn(name = "patron_database_entity"))*/
-    @Transient
+    @ElementCollection
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "patron_database_entity_id", referencedColumnName = "id")
     private Set<HoldDatabaseEntity> booksOnHold;
 
     PatronDatabaseEntity(PatronId patronId, PatronType patronType) {
         this.patronId = patronId.getPatronId();
         this.patronType = patronType;
-        booksOnHold = HashSet.empty();
+        booksOnHold = new HashSet<>();
     }
 }
 

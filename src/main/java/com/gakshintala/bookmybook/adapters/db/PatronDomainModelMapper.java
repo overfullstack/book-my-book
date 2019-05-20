@@ -12,6 +12,7 @@ import com.gakshintala.bookmybook.infrastructure.repositories.patron.PatronDatab
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
 import lombok.experimental.UtilityClass;
 
 import static com.gakshintala.bookmybook.core.domain.patron.PlacingOnHoldPolicies.allCurrentPolicies;
@@ -36,8 +37,7 @@ public class PatronDomainModelMapper {
     }
 
     private static Set<Tuple2<CatalogueBookInstanceId, LibraryBranchId>> mapPatronHolds(PatronDatabaseEntity patronDatabaseEntity) {
-        return patronDatabaseEntity
-                .getBooksOnHold()
+        return Stream.ofAll(patronDatabaseEntity.getBooksOnHold())
                 .map(entity -> Tuple.of((new CatalogueBookInstanceId(entity.getBookId())), new LibraryBranchId(entity.getLibraryBranchId())))
                 .toSet();
     }
