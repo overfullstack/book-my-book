@@ -16,6 +16,5 @@ public class ISBN {
             throw new IllegalArgumentException("Wrong ISBN!");
         }
         this.isbn = isbn.trim();
-
     }
 }

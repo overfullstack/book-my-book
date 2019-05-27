@@ -43,19 +43,16 @@ public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.
     @Override
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull CollectBookCommand command) {
         return findBookOnHold.findBookOnHold(command.getCatalogueBookInstanceId())
-                .map(bookOnHold -> findPatron.findBy(command.getPatronId())
+                .flatMap(bookOnHold -> findPatron.findBy(command.getPatronId())
                         .map(patron -> collect(patron, bookOnHold, command.getCheckoutDuration()))
-                        .map(this::handleResult)
-                        .map(Try::get)
-                        .get());
+                        .flatMap(this::handleResult));
     }
 
     private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookCollectingFailed, BookCollected> result) {
         return result
                 .map(bookCollected -> handlePatronEvent.handle(bookCollected)
-                        .map(patron -> handlePatronEventInLibrary.handle(bookCollected)
-                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookCollected, patron, catalogueBookInstanceId)))
-                        .get())
+                        .flatMap(patron -> handlePatronEventInLibrary.handle(bookCollected)
+                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookCollected, patron, catalogueBookInstanceId)))) // Just simulating the need where downstream need upstream results
                 .getOrElseGet(bookCollectingFailed -> Try.success(Tuple.of(bookCollectingFailed, null, null)));
     }
 

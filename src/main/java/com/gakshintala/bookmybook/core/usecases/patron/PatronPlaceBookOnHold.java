@@ -34,19 +34,16 @@ public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.Plac
     @Override
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull PlaceOnHoldCommand command) {
         return findAvailableBook.findAvailableBook(command.getCatalogueBookInstanceId())
-                .map(availableBook -> findPatron.findBy(command.getPatronId())
+                .flatMap(availableBook -> findPatron.findBy(command.getPatronId())
                         .map(patron -> patron.canPatronPlaceOnHold(availableBook, command.getHoldDuration()))
-                        .map(this::handleResult)
-                        .map(Try::get)
-                        .get());
+                        .flatMap(this::handleResult));
     }
 
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookHoldFailed, BookPlacedOnHold> result) {
         return result
                 .map(bookPlacedOnHold -> handlePatronEvent.handle(bookPlacedOnHold)
-                        .map(patron -> handlePatronEventInLibrary.handle(bookPlacedOnHold)
-                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookPlacedOnHold, patron, catalogueBookInstanceId)))
-                        .get())
+                        .flatMap(patron -> handlePatronEventInLibrary.handle(bookPlacedOnHold)
+                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookPlacedOnHold, patron, catalogueBookInstanceId))))
                 .getOrElseGet(bookHoldFailed -> Try.success(Tuple.of(bookHoldFailed, null, null)));
     }
 

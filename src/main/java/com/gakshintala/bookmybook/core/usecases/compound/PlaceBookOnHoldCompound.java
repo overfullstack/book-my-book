@@ -28,10 +28,9 @@ public class PlaceBookOnHoldCompound implements UseCase<PlaceBookOnHoldCompound.
     @Override
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull PlaceBookOnHoldCompound.PlaceOnHoldCompoundCommand command) {
         return addBookEverywhere.execute(command.getAddBookEverywhereCommand())
-                .map(tuple2 -> createPatron.execute(command.createPatronCommand)
+                .flatMap(tuple2 -> createPatron.execute(command.createPatronCommand)
                         .map(patron -> patron.canPatronPlaceOnHold(tuple2._2, command.holdDuration))
-                        .flatMap(placeBookOnHold::handleResult))
-                .get();
+                        .flatMap(placeBookOnHold::handleResult));
     }
 
     @Value

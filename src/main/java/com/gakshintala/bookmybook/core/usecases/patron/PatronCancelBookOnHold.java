@@ -41,19 +41,16 @@ public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.Ca
     @Override
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> execute(@NonNull CancelHoldCommand command) {
         return findBookOnHold.findBookOnHold(command.getCatalogueBookInstanceId())
-                .map(bookOnHold -> findPatron.findBy(command.getPatronId())
+                .flatMap(bookOnHold -> findPatron.findBy(command.getPatronId())
                         .map(patron -> cancelHold(patron, bookOnHold))
-                        .map(this::handleResult)
-                        .map(Try::get)
-                        .get());
+                        .flatMap(this::handleResult));
     }
 
     private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookHoldCancelingFailed, BookHoldCanceled> result) {
         return result
                 .map(bookHoldCanceled -> handlePatronEvent.handle(bookHoldCanceled)
-                        .map(patron -> handlePatronEventInLibrary.handle(bookHoldCanceled)
-                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookHoldCanceled, patron, catalogueBookInstanceId)))
-                        .get())
+                        .flatMap(patron -> handlePatronEventInLibrary.handle(bookHoldCanceled)
+                                .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookHoldCanceled, patron, catalogueBookInstanceId)))) // The nesting id done only to use args from upper layer compositions
                 .getOrElseGet(bookHoldCancelingFailed -> Try.success(Tuple.of(bookHoldCancelingFailed, null, null)));
     }
 
