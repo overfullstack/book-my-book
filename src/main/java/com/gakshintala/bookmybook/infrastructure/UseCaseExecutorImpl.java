@@ -11,8 +11,9 @@ import java.util.function.Function;
 @Service
 public class UseCaseExecutorImpl implements UseCaseExecutor {
     @Override
-    public <RX, I, O extends Try> CompletableFuture<RX> execute(
-            UseCase<I, O> useCase, I input, Function<O, RX> outputMapper) {
+    public <ResponseT, I, O extends Try> CompletableFuture<ResponseT> execute(
+            UseCase<I, O> useCase, I input,
+            Function<O, ResponseT> outputMapper) {
         return CompletableFuture
                 .supplyAsync(() -> input)
                 .thenApplyAsync(useCase::execute)

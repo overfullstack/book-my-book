@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public interface UseCaseExecutor {
-    <RX, I, O extends Try> CompletableFuture<RX> execute(
+    <ResponseT, I, O extends Try> CompletableFuture<ResponseT> execute(
             UseCase<I, O> useCase,
             I input,
-            Function<O, RX> outputMapper);
+            Function<O, ResponseT> outputMapper);
 }
