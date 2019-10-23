@@ -63,7 +63,7 @@ public class BookFixture {
     }
 
 
-    private static PatronId anyPatronId() {
+    public static PatronId anyPatronId() {
         return new PatronId(UUID.randomUUID());
     }
 

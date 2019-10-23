@@ -121,3 +121,4 @@ gradle-app.setting
 
 /src/main/resources/rebel.xml
 /.idea/sonarlint/
+bin/
