@@ -2,7 +2,7 @@ package com.gakshintala.bookmybook.core.usecases.patron;
 
 import com.gakshintala.bookmybook.core.domain.patron.Patron;
 import com.gakshintala.bookmybook.core.domain.patron.PatronInformation;
-import com.gakshintala.bookmybook.core.ports.repositories.patron.PersistPatron;
+import com.gakshintala.bookmybook.core.ports.persistence.patron.PersistPatron;
 import com.gakshintala.bookmybook.core.ports.UseCase;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;

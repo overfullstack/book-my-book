@@ -2,7 +2,7 @@ package com.gakshintala.bookmybook.core.usecases.catalogue;
 
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBook;
 import com.gakshintala.bookmybook.core.domain.catalogue.CatalogueBookId;
-import com.gakshintala.bookmybook.core.ports.repositories.catalogue.PersistCatalogueBook;
+import com.gakshintala.bookmybook.core.ports.persistence.catalogue.PersistCatalogueBook;
 import com.gakshintala.bookmybook.core.ports.UseCase;
 import io.vavr.Tuple2;
 import io.vavr.control.Try;

@@ -1,6 +1,6 @@
 # Book-my-Book
 
-![](docs/book-my-book.png)
+![](docs/book-my-book-mine.png)
 
 (DDD)
     .andThen(Clean Architecture/Ports & Adapters)
