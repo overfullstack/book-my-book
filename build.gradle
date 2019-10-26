@@ -1,34 +1,24 @@
 plugins {
-    id "org.springframework.boot" version "2.2.0.RELEASE"
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
-    id "org.flywaydb.flyway" version "6.0.7"
-    id "java"
-    id "idea"
-    id "war"
-    id "io.freefair.lombok" version "4.1.2"
 }
 
-group = "com.gakshintala"
-version = "0.0.1-SNAPSHOT"
+subprojects {
+    group = "com.gakshintala.bookmybook"
+    version = "0.0.1-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+    apply plugin: "java"
+    apply plugin: "java-library"
+    apply plugin: "idea"
+    apply plugin: "io.spring.dependency-management"
+
+    repositories {
+        jcenter()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.2.0.RELEASE")
+        }
+    }
 }
 
-dependencies {
-    compile("io.vavr:vavr:0.10.0")
-
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation "org.springframework.boot:spring-boot-starter-web"
-
-    compile group: "org.springframework.data", name: "spring-data-jdbc", version: "1.1.0.RELEASE"
-
-    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
-    runtimeOnly "org.springframework.boot:spring-boot-devtools"
-    runtimeOnly "com.h2database:h2"
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.codehaus.groovy:groovy"
-    testImplementation "org.spockframework:spock-spring:1.2-groovy-2.5"
-    testImplementation "org.spockframework:spock-core:1.2-groovy-2.5"
-}

@@ -1,0 +1,5 @@
+dependencies {
+    implementation project(':core')
+
+    implementation group: 'io.vavr', name: 'vavr', version: '0.10.2'
+}

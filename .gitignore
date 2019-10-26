@@ -122,3 +122,9 @@ gradle-app.setting
 /src/main/resources/rebel.xml
 /.idea/sonarlint/
 bin/
+/adapters/build/
+/adapters/persistence/build/
+/adapters/web/build/
+/common/build/
+/config/build/
+/test-fixtures/build/

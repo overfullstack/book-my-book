@@ -1,6 +1,8 @@
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-    }
-}
 rootProject.name = 'book-my-book'
+include 'adapters:persistence'
+include 'adapters:web'
+include 'core'
+include 'test-fixtures'
+include 'config'
+include 'common'
+
