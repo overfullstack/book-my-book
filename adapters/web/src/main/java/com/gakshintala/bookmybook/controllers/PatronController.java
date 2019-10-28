@@ -1,7 +1,7 @@
 package com.gakshintala.bookmybook.controllers;
 
 
-import com.gakshintala.bookmybook.ports.UseCaseExecutor;
+import com.gakshintala.bookmybook.UseCaseExecutor;
 import com.gakshintala.bookmybook.restexchange.compound.request.PlaceBookOnHoldCompoundRequest;
 import com.gakshintala.bookmybook.restexchange.patron.request.CancelHoldRequest;
 import com.gakshintala.bookmybook.restexchange.patron.request.CollectBookOnHoldRequest;
@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/patron")
 @RequiredArgsConstructor
 public class PatronController {
-    private final UseCaseExecutor useCaseExecutor;
     private final CreatePatron createPatron;
     private final PatronPlaceBookOnHold patronPlaceBookOnHold;
     private final PatronCollectBookOnHold patronCollectBookOnHold;
@@ -36,7 +35,7 @@ public class PatronController {
 
     @PostMapping("/create")
     public CompletableFuture<PatronResponse> createPatron(@Valid @RequestBody CreatePatronRequest createPatronRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 createPatron,
                 createPatronRequest.toCommand(),
                 PatronResponse::fromResult
@@ -45,7 +44,7 @@ public class PatronController {
 
     @PostMapping("/place-on-hold")
     public CompletableFuture<PatronEventResponse> placeOnHold(@Valid @RequestBody PlaceBookOnHoldRequest placeBookOnHoldRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 patronPlaceBookOnHold,
                 placeBookOnHoldRequest.toCommand(),
                 PatronEventResponse::fromResult
@@ -54,7 +53,7 @@ public class PatronController {
 
     @PostMapping("/collect")
     public CompletableFuture<PatronEventResponse> collectOnHold(@Valid @RequestBody CollectBookOnHoldRequest collectBookOnHoldRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 patronCollectBookOnHold,
                 collectBookOnHoldRequest.toCommand(),
                 PatronEventResponse::fromResult
@@ -63,7 +62,7 @@ public class PatronController {
 
     @PostMapping("/cancel")
     public CompletableFuture<PatronEventResponse> cancelOnHold(@Valid @RequestBody CancelHoldRequest cancelHoldRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 patronCancelBookOnHold,
                 cancelHoldRequest.toCommand(),
                 PatronEventResponse::fromResult
@@ -72,7 +71,7 @@ public class PatronController {
 
     @PostMapping("/compound-place-on-hold")
     public CompletableFuture<PatronEventResponse> placeOnHoldCompound(@Valid @RequestBody PlaceBookOnHoldCompoundRequest placeBookOnHoldCompoundRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 placeBookOnHoldCompound,
                 placeBookOnHoldCompoundRequest.toCommand(),
                 PatronEventResponse::fromResult

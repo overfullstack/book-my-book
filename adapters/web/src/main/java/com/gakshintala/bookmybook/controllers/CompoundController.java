@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.controllers;
 
-import com.gakshintala.bookmybook.ports.UseCaseExecutor;
+import com.gakshintala.bookmybook.UseCaseExecutor;
 import com.gakshintala.bookmybook.restexchange.compound.request.AddBookEverywhereRequest;
 import com.gakshintala.bookmybook.restexchange.compound.request.PlaceBookOnHoldCompoundRequest;
 import com.gakshintala.bookmybook.restexchange.library.response.AddBookToLibraryResponse;
@@ -20,13 +20,12 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/compound")
 @RequiredArgsConstructor
 public class CompoundController {
-    private final UseCaseExecutor useCaseExecutor;
     private final AddBookEverywhere addBookEverywhere;
     private final PlaceBookOnHoldCompound placeBookOnHoldCompound;
 
     @PostMapping("/add-book-everywhere")
     public CompletableFuture<AddBookToLibraryResponse> addBookEverywhere(@Valid @RequestBody AddBookEverywhereRequest addBookEverywhereRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 addBookEverywhere,
                 addBookEverywhereRequest.toCommand(),
                 AddBookToLibraryResponse::fromResult
@@ -35,7 +34,7 @@ public class CompoundController {
 
     @PostMapping("/place-on-hold")
     public CompletableFuture<PatronEventResponse> placeOnHoldCompound(@Valid @RequestBody PlaceBookOnHoldCompoundRequest placeBookOnHoldCompoundRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 placeBookOnHoldCompound,
                 placeBookOnHoldCompoundRequest.toCommand(),
                 PatronEventResponse::fromResult

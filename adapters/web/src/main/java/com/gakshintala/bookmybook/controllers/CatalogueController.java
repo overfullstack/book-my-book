@@ -1,6 +1,6 @@
 package com.gakshintala.bookmybook.controllers;
 
-import com.gakshintala.bookmybook.ports.UseCaseExecutor;
+import com.gakshintala.bookmybook.UseCaseExecutor;
 import com.gakshintala.bookmybook.restexchange.catalogue.request.AddBookInstanceToCatalogueRequest;
 import com.gakshintala.bookmybook.restexchange.catalogue.request.AddBookToCatalogueRequest;
 import com.gakshintala.bookmybook.restexchange.catalogue.response.CatalogueBookIdResponse;
@@ -20,13 +20,12 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/catalogue")
 @RequiredArgsConstructor
 public class CatalogueController {
-    private final UseCaseExecutor useCaseExecutor;
     private final AddBookToCatalogue addBookToCatalogue;
     private final AddBookInstanceToCatalogue addBookInstanceToCatalogue;
 
     @PostMapping("/add-book")
     public CompletableFuture<CatalogueBookIdResponse> addBookToCatalogue(@Valid @RequestBody AddBookToCatalogueRequest addBookToCatalogueRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 addBookToCatalogue,
                 addBookToCatalogueRequest.toCommand(),
                 CatalogueBookIdResponse::fromResult
@@ -35,7 +34,7 @@ public class CatalogueController {
 
     @PostMapping("/add-book-instance")
     public CompletableFuture<CatalogueBookInstanceIdResponse> addBookInstanceToCatalogue(@Valid @RequestBody AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest) {
-        return useCaseExecutor.execute(
+        return UseCaseExecutor.execute(
                 addBookInstanceToCatalogue,
                 addBookInstanceToCatalogueRequest.toCommand(),
                 CatalogueBookInstanceIdResponse::fromResult
