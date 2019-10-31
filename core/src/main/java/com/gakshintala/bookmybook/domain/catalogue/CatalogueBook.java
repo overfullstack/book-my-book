@@ -7,12 +7,12 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-@EqualsAndHashCode(of = "bookIsbn")
+@EqualsAndHashCode(of = "isbn")
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class CatalogueBook {
 
     @NonNull
-    private ISBN bookIsbn;
+    private ISBN isbn;
     @NonNull
     private Title title;
     @NonNull

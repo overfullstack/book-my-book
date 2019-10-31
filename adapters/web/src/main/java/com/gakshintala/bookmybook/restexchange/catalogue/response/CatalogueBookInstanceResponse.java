@@ -7,13 +7,13 @@ import lombok.Value;
 
 @Value
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CatalogueBookInstanceIdResponse {
+public class CatalogueBookInstanceResponse {
     Boolean success;
     String message;
     CatalogueBookInstanceId catalogueBookInstanceId;
 
-    public static CatalogueBookInstanceIdResponse fromResult(Try<CatalogueBookInstanceId> result) {
-        return result.map(catalogueBookInstanceId -> new CatalogueBookInstanceIdResponse(true, "Success!", catalogueBookInstanceId))
-                .getOrElseGet(cause -> new CatalogueBookInstanceIdResponse(false, cause.getMessage(), null));
+    public static CatalogueBookInstanceResponse fromResult(Try<CatalogueBookInstanceId> result) {
+        return result.map(catalogueBookInstanceId -> new CatalogueBookInstanceResponse(true, "Success!", catalogueBookInstanceId))
+                .getOrElseGet(cause -> new CatalogueBookInstanceResponse(false, cause.getMessage(), null));
     }
 }

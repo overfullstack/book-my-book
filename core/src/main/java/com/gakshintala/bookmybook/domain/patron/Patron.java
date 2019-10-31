@@ -43,6 +43,13 @@ public class Patron {
                 patronInformation.getPatronId());
     }
 
+    /**
+     * Two different events for same cause, just that one has extra info when MAX_NUMBER_OF_HOLDS is reached.
+     *
+     * @param aBook
+     * @param duration
+     * @return
+     */
     private BookPlacedOnHold getBookPlacedOnHold(AvailableBook aBook, HoldDuration duration) {
         return patronHolds.maximumHoldsAfterHolding()
                 ? with(getBookPlacedOnHoldNow(aBook, duration), now(patronInformation, MAX_NUMBER_OF_HOLDS))

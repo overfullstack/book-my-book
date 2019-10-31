@@ -1,4 +1,4 @@
-package com.gakshintala.bookmybook.controllers;
+package com.gakshintala.bookmybook;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

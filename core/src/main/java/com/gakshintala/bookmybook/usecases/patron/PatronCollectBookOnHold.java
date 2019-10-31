@@ -14,7 +14,7 @@ import com.gakshintala.bookmybook.ports.UseCase;
 import com.gakshintala.bookmybook.ports.persistence.library.FindBookOnHold;
 import com.gakshintala.bookmybook.ports.persistence.library.HandlePatronEventInLibrary;
 import com.gakshintala.bookmybook.ports.persistence.patron.FindPatron;
-import com.gakshintala.bookmybook.ports.persistence.patron.HandlePatronEvent;
+import com.gakshintala.bookmybook.ports.persistence.patron.PatronEventHandler;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.control.Either;
@@ -37,7 +37,7 @@ import static io.vavr.control.Either.right;
 public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.CollectBookCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>>> {
     private final FindBookOnHold findBookOnHold;
     private final FindPatron findPatron;
-    private final HandlePatronEvent handlePatronEvent;
+    private final PatronEventHandler patronEventHandler;
     private final HandlePatronEventInLibrary handlePatronEventInLibrary;
 
     @Override
@@ -50,7 +50,7 @@ public class PatronCollectBookOnHold implements UseCase<PatronCollectBookOnHold.
 
     private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookCollectingFailed, BookCollected> result) {
         return result
-                .map(bookCollected -> handlePatronEvent.handle(bookCollected)
+                .map(bookCollected -> patronEventHandler.handle(bookCollected)
                         .flatMap(patron -> handlePatronEventInLibrary.handle(bookCollected)
                                 .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookCollected, patron, catalogueBookInstanceId)))) // Just simulating the need where downstream need upstream results
                 .getOrElseGet(bookCollectingFailed -> Try.success(Tuple.of(bookCollectingFailed, null, null)));

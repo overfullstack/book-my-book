@@ -11,9 +11,5 @@
         <module name="book-my-book.adapters.web.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="book-my-book.test-com.gakshintala.bookmybook.fixtures.main" target="12" />
-      <module name="book-my-book.test-com.gakshintala.bookmybook.fixtures.test" target="12" />
-    </bytecodeTargetLevel>
   </component>
 </project>

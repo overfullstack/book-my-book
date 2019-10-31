@@ -9,13 +9,13 @@ import lombok.Value;
 
 @Value
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CatalogueBookIdResponse {
+public class CatalogueBookResponse {
     Boolean success;
     String message;
     Tuple2<CatalogueBookId, CatalogueBook> catalogueBookInfo;
 
-    public static CatalogueBookIdResponse fromResult(Try<Tuple2<CatalogueBookId, CatalogueBook>> result) {
-        return result.map(catalogueBookInfo -> new CatalogueBookIdResponse(true, "Success!", catalogueBookInfo))
-                .getOrElseGet(cause -> new CatalogueBookIdResponse(false, cause.getMessage(), null));
+    public static CatalogueBookResponse fromResult(Try<Tuple2<CatalogueBookId, CatalogueBook>> result) {
+        return result.map(catalogueBookInfo -> new CatalogueBookResponse(true, "Success!", catalogueBookInfo))
+                .getOrElseGet(cause -> new CatalogueBookResponse(false, cause.getMessage(), null));
     }
 }

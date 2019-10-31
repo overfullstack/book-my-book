@@ -3,17 +3,13 @@ package com.gakshintala.bookmybook.repositories.library;
 
 import com.gakshintala.bookmybook.domain.catalogue.BookType;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
 @Data
-@Entity
-@Table(name = "book_database_entity")
-public class BookDatabaseEntity {
+public class BookEntity {
 
     @Id
     int id;

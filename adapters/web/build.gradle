@@ -12,7 +12,8 @@ dependencies {
 
     runtimeOnly "org.springframework.boot:spring-boot-devtools"
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude group: 'junit' // excluding junit 4
+        exclude group: 'junit'
+        exclude group: 'org.junit.vintage'
     }
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'

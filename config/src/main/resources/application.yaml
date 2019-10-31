@@ -15,7 +15,8 @@ server:
 
 logging:
   level:
-    org.springframework.web: INFO
+    root: info
+    org.springframework.web: info
     org.hibernate:
       SQL: debug
       type: trace
@@ -29,10 +30,6 @@ spring:
   h2:
     console:
       enabled: true
-
-logging:
-  level:
-    org.springframework.web: DEBUG
 
 management:
   endpoints:

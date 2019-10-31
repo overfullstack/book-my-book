@@ -3,6 +3,8 @@ package com.gakshintala.bookmybook.domain.catalogue;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.beans.ConstructorProperties;
+
 @Value
 public class ISBN {
 
@@ -11,6 +13,7 @@ public class ISBN {
     @NonNull
     String isbn;
 
+    @ConstructorProperties({"isbn"})
     public ISBN(String isbn) {
         if (!isbn.trim().matches(VERY_SIMPLE_ISBN_CHECK)) {
             throw new IllegalArgumentException("Wrong ISBN!");

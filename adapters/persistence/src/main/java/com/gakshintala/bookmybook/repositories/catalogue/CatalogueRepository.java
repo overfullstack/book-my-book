@@ -23,7 +23,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 /**
@@ -39,24 +38,24 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
 
     @Override
     public Try<Tuple2<CatalogueBookId, CatalogueBook>> persist(CatalogueBook catalogueBook) {
-        Function<JdbcTemplate, UnaryOperator<KeyHolder>> persistBook = jdbc -> keyHolder -> {
-            jdbc.update(connection -> {
+        UnaryOperator<KeyHolder> persistBook = keyHolder -> {
+            jdbcTemplate.update(connection -> {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CATALOGUE_BOOK_SQL, Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setString(1, catalogueBook.getBookIsbn().getIsbn());
+                preparedStatement.setString(1, catalogueBook.getIsbn().getIsbn());
                 preparedStatement.setString(2, catalogueBook.getTitle().getTitle());
                 preparedStatement.setString(3, catalogueBook.getAuthor().getName());
                 return preparedStatement;
             }, keyHolder);
             return keyHolder;
         };
-        return DBUtils.insertAndGetGeneratedKey(persistBook, jdbcTemplate)
+        return DBUtils.insertAndGetGeneratedKey(persistBook)
                 .map(catalogueBookId -> Tuple.of(new CatalogueBookId(catalogueBookId), catalogueBook));
     }
 
     @Override
     public Try<CatalogueBookInstanceId> persist(CatalogueBookInstance catalogueBookInstance) {
-        Function<JdbcTemplate, UnaryOperator<KeyHolder>> persistBookInstance = jdbc -> keyHolder -> {
-            jdbc.update(connection -> {
+        UnaryOperator<KeyHolder> persistBookInstance = keyHolder -> {
+            jdbcTemplate.update(connection -> {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CATALOGUE_BOOK_INSTANCE_SQL, Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setString(1, catalogueBookInstance.getBookIsbn().getIsbn());
                 preparedStatement.setObject(2, catalogueBookInstance.getCatalogueBookInstanceId().getBookInstanceUUID().toString());
@@ -64,7 +63,7 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
             }, keyHolder);
             return keyHolder;
         };
-        return DBUtils.insertAndGetGeneratedKey(persistBookInstance, jdbcTemplate)
+        return DBUtils.insertAndGetGeneratedKey(persistBookInstance)
                 .map(ignore -> catalogueBookInstance.getCatalogueBookInstanceId());
     }
 
@@ -73,7 +72,7 @@ class CatalogueRepository implements PersistCatalogueBook, PersistBookInstance, 
         return Try.of(() -> Option.of(
                 jdbcTemplate.queryForObject(
                         "SELECT b.* FROM catalogue_book b WHERE b.isbn = ?",
-                        new BeanPropertyRowMapper<>(CatalogueBookDatabaseEntity.class),
+                        new BeanPropertyRowMapper<>(CatalogueBookEntity.class),
                         isbn.getIsbn()))
                 .map(CatalogueBookDomainMapper::toDomainModel)
                 .getOrElseThrow(() -> new IllegalArgumentException("No Book found with ISBN: " + isbn.getIsbn())));

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS catalogue_book_instance
 CREATE SEQUENCE catalogue_book_instance_seq;
 
 
-CREATE TABLE IF NOT EXISTS book_database_entity
+CREATE TABLE IF NOT EXISTS book_entity
 (
     id                  INTEGER IDENTITY PRIMARY KEY,
     book_id             UUID UNIQUE,
@@ -31,23 +31,22 @@ CREATE TABLE IF NOT EXISTS book_database_entity
     on_hold_till        TIMESTAMP,
     version             INTEGER
 );
-CREATE SEQUENCE book_database_entity_seq;
+CREATE SEQUENCE book_entity_seq;
 
 
-CREATE TABLE IF NOT EXISTS patron_database_entity
+CREATE TABLE IF NOT EXISTS patron_entity
 (
     id          INTEGER IDENTITY PRIMARY KEY,
     patron_id   UUID UNIQUE,
     patron_type VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS hold_database_entity
+CREATE TABLE IF NOT EXISTS hold_entity
 (
-    id                        INTEGER IDENTITY PRIMARY KEY,
-    book_id                   UUID      NOT NULL,
-    patron_id                 UUID      NOT NULL,
-    library_branch_id         UUID      NOT NULL,
-    patron_database_entity_id INTEGER   NOT NULL,
-    till                      TIMESTAMP NOT NULL
+    id                INTEGER IDENTITY PRIMARY KEY,
+    book_id           UUID      NOT NULL,
+    patron_id         UUID      NOT NULL,
+    library_branch_id UUID      NOT NULL,
+    patron_entity     INTEGER   NOT NULL,
+    till              TIMESTAMP NOT NULL
 );
-

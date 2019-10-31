@@ -5,6 +5,6 @@ import com.gakshintala.bookmybook.domain.patron.PatronEvent;
 import io.vavr.control.Try;
 
 @FunctionalInterface
-public interface HandlePatronEvent {
+public interface PatronEventHandler {
     Try<Patron> handle(PatronEvent patronEvent);
 }

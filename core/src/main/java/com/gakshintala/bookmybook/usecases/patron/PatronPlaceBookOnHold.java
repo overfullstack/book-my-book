@@ -12,7 +12,7 @@ import com.gakshintala.bookmybook.ports.UseCase;
 import com.gakshintala.bookmybook.ports.persistence.library.FindAvailableBook;
 import com.gakshintala.bookmybook.ports.persistence.library.HandlePatronEventInLibrary;
 import com.gakshintala.bookmybook.ports.persistence.patron.FindPatron;
-import com.gakshintala.bookmybook.ports.persistence.patron.HandlePatronEvent;
+import com.gakshintala.bookmybook.ports.persistence.patron.PatronEventHandler;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.control.Either;
@@ -29,7 +29,7 @@ import java.time.Instant;
 public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.PlaceOnHoldCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>>> {
     private final FindAvailableBook findAvailableBook;
     private final FindPatron findPatron;
-    private final HandlePatronEvent handlePatronEvent;
+    private final PatronEventHandler patronEventHandler;
     private final HandlePatronEventInLibrary handlePatronEventInLibrary;
 
     @Override
@@ -40,9 +40,15 @@ public class PatronPlaceBookOnHold implements UseCase<PatronPlaceBookOnHold.Plac
                         .flatMap(this::handleResult));
     }
 
+    /**
+     * Event is currently handled sequentially, like LibraryRepository handles the event after PatronRepository.
+     *
+     * @param result
+     * @return
+     */
     public Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookHoldFailed, BookPlacedOnHold> result) {
         return result
-                .map(bookPlacedOnHold -> handlePatronEvent.handle(bookPlacedOnHold)
+                .map(bookPlacedOnHold -> patronEventHandler.handle(bookPlacedOnHold)
                         .flatMap(patron -> handlePatronEventInLibrary.handle(bookPlacedOnHold)
                                 .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookPlacedOnHold, patron, catalogueBookInstanceId))))
                 .getOrElseGet(bookHoldFailed -> Try.success(Tuple.of(bookHoldFailed, null, null)));

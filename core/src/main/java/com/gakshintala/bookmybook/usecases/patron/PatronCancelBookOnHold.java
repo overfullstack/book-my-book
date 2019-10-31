@@ -12,7 +12,7 @@ import com.gakshintala.bookmybook.ports.UseCase;
 import com.gakshintala.bookmybook.ports.persistence.library.FindBookOnHold;
 import com.gakshintala.bookmybook.ports.persistence.library.HandlePatronEventInLibrary;
 import com.gakshintala.bookmybook.ports.persistence.patron.FindPatron;
-import com.gakshintala.bookmybook.ports.persistence.patron.HandlePatronEvent;
+import com.gakshintala.bookmybook.ports.persistence.patron.PatronEventHandler;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
 import io.vavr.control.Either;
@@ -35,7 +35,7 @@ import static io.vavr.control.Either.right;
 public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.CancelHoldCommand, Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>>> {
     private final FindBookOnHold findBookOnHold;
     private final FindPatron findPatron;
-    private final HandlePatronEvent handlePatronEvent;
+    private final PatronEventHandler patronEventHandler;
     private final HandlePatronEventInLibrary handlePatronEventInLibrary;
 
     @Override
@@ -48,7 +48,7 @@ public class PatronCancelBookOnHold implements UseCase<PatronCancelBookOnHold.Ca
 
     private Try<Tuple3<PatronEvent, Patron, CatalogueBookInstanceId>> handleResult(Either<BookHoldCancelingFailed, BookHoldCanceled> result) {
         return result
-                .map(bookHoldCanceled -> handlePatronEvent.handle(bookHoldCanceled)
+                .map(bookHoldCanceled -> patronEventHandler.handle(bookHoldCanceled)
                         .flatMap(patron -> handlePatronEventInLibrary.handle(bookHoldCanceled)
                                 .map(catalogueBookInstanceId -> Tuple.of((PatronEvent) bookHoldCanceled, patron, catalogueBookInstanceId)))) // The nesting id done only to use args from upper layer compositions
                 .getOrElseGet(bookHoldCancelingFailed -> Try.success(Tuple.of(bookHoldCancelingFailed, null, null)));

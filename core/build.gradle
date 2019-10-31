@@ -10,7 +10,8 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'junit' // excluding junit 4
+        exclude group: 'junit'
+        exclude group: 'org.junit.vintage'
     }
     testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
     

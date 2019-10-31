@@ -1,13 +1,15 @@
 package com.gakshintala.bookmybook.domain.catalogue;
 
-import lombok.NonNull;
 import lombok.Value;
+
+import java.beans.ConstructorProperties;
 
 @Value
 public class Author {
 
-    @NonNull String name;
+    String name;
 
+    @ConstructorProperties({"name"})
     Author(String name) {
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Author cannot be empty");

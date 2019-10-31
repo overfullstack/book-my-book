@@ -3,8 +3,8 @@ package com.gakshintala.bookmybook.controllers;
 import com.gakshintala.bookmybook.UseCaseExecutor;
 import com.gakshintala.bookmybook.restexchange.catalogue.request.AddBookInstanceToCatalogueRequest;
 import com.gakshintala.bookmybook.restexchange.catalogue.request.AddBookToCatalogueRequest;
-import com.gakshintala.bookmybook.restexchange.catalogue.response.CatalogueBookIdResponse;
-import com.gakshintala.bookmybook.restexchange.catalogue.response.CatalogueBookInstanceIdResponse;
+import com.gakshintala.bookmybook.restexchange.catalogue.response.CatalogueBookInstanceResponse;
+import com.gakshintala.bookmybook.restexchange.catalogue.response.CatalogueBookResponse;
 import com.gakshintala.bookmybook.usecases.catalogue.AddBookInstanceToCatalogue;
 import com.gakshintala.bookmybook.usecases.catalogue.AddBookToCatalogue;
 import lombok.RequiredArgsConstructor;
@@ -24,20 +24,20 @@ public class CatalogueController {
     private final AddBookInstanceToCatalogue addBookInstanceToCatalogue;
 
     @PostMapping("/add-book")
-    public CompletableFuture<CatalogueBookIdResponse> addBookToCatalogue(@Valid @RequestBody AddBookToCatalogueRequest addBookToCatalogueRequest) {
+    public CompletableFuture<CatalogueBookResponse> addBookToCatalogue(@Valid @RequestBody AddBookToCatalogueRequest addBookToCatalogueRequest) {
         return UseCaseExecutor.execute(
                 addBookToCatalogue,
                 addBookToCatalogueRequest.toCommand(),
-                CatalogueBookIdResponse::fromResult
+                CatalogueBookResponse::fromResult
         );
     }
 
     @PostMapping("/add-book-instance")
-    public CompletableFuture<CatalogueBookInstanceIdResponse> addBookInstanceToCatalogue(@Valid @RequestBody AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest) {
+    public CompletableFuture<CatalogueBookInstanceResponse> addBookInstanceToCatalogue(@Valid @RequestBody AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest) {
         return UseCaseExecutor.execute(
                 addBookInstanceToCatalogue,
                 addBookInstanceToCatalogueRequest.toCommand(),
-                CatalogueBookInstanceIdResponse::fromResult
+                CatalogueBookInstanceResponse::fromResult
         );
     }
 }

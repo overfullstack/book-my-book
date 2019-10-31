@@ -35,6 +35,9 @@ public interface PatronEvent {
         }
     }
 
+    /**
+     * A combination of Book Place on hold + Max holds reached.
+     */
     @Value
     class BookPlacedOnHoldNow implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
@@ -63,7 +66,7 @@ public interface PatronEvent {
     class BookPlacedOnHold implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull UUID patronId;
-        @NonNull PatronEvent.BookPlacedOnHoldNow bookPlacedOnHoldNow;
+        @NonNull BookPlacedOnHoldNow bookPlacedOnHoldNow;
         @NonNull Option<MaximumNumberOfHoldsReached> maximumNumberOfHoldsReached;
 
         public static BookPlacedOnHold with(BookPlacedOnHoldNow bookPlacedOnHoldNow) {
