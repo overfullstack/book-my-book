@@ -49,6 +49,7 @@ public class PatronRepositoryHandler implements FindPatron, PersistPatron, Patro
     private static Function4<UUID, UUID, UUID, PatronEntity, PatronEntity> removeHoldIfPresent = (patronId, bookId, libraryBranchId, patronEntity) ->
             patronEntity.withBooksOnHold(Stream.ofAll(patronEntity.getBooksOnHold())
                     .filter(holdEntity -> !holdEntity.is(patronId, bookId, libraryBranchId)).toJavaSet());
+    
     private static final Function2<PatronEntity, BookCollected, PatronEntity> handleBookCollected =
             (patronEntity, bookCollected) -> removeHoldIfPresent.apply(bookCollected.getPatronId(), bookCollected.getBookId(), bookCollected.getLibraryBranchId(), patronEntity);
 

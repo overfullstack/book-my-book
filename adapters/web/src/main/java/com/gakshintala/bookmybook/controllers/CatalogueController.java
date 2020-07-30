@@ -8,6 +8,7 @@ import com.gakshintala.bookmybook.restexchange.catalogue.response.CatalogueBookR
 import com.gakshintala.bookmybook.usecases.catalogue.AddBookInstanceToCatalogue;
 import com.gakshintala.bookmybook.usecases.catalogue.AddBookToCatalogue;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class CatalogueController {
     private final AddBookToCatalogue addBookToCatalogue;
     private final AddBookInstanceToCatalogue addBookInstanceToCatalogue;
 
+    @Async
     @PostMapping("/add-book")
     public CompletableFuture<CatalogueBookResponse> addBookToCatalogue(@Valid @RequestBody AddBookToCatalogueRequest addBookToCatalogueRequest) {
         return UseCaseExecutor.execute(
@@ -32,6 +34,7 @@ public class CatalogueController {
         );
     }
 
+    @Async
     @PostMapping("/add-book-instance")
     public CompletableFuture<CatalogueBookInstanceResponse> addBookInstanceToCatalogue(@Valid @RequestBody AddBookInstanceToCatalogueRequest addBookInstanceToCatalogueRequest) {
         return UseCaseExecutor.execute(

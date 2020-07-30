@@ -30,7 +30,7 @@ class CatalogueControllerTest {
 
     @Test
     void addBookToCatalogue() throws Exception {
-        AddBookToCatalogueRequest addBookToCatalogueRequest =
+        var addBookToCatalogueRequest = 
                 new AddBookToCatalogueRequest("0321125215", "title", "author");
         mockMvc.perform(
                 post("/catalogue/add-book")

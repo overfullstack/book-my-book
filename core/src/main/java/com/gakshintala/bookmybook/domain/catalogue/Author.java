@@ -8,7 +8,7 @@ import java.beans.ConstructorProperties;
 public class Author {
 
     String name;
-
+    // TODO 1/30/20 gakshintala: Try to use a static constructor and instead of throwing exception, return a Either Monad.
     @ConstructorProperties({"name"})
     Author(String name) {
         if (name.isEmpty()) {

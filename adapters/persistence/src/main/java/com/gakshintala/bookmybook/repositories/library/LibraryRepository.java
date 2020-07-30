@@ -54,6 +54,7 @@ import static io.vavr.Predicates.instanceOf;
 @Repository
 @RequiredArgsConstructor
 class LibraryRepository implements PersistBookInLibrary, FindAvailableBook, FindBookOnHold, HandlePatronEventInLibrary {
+    
     private static final String INSERT_BOOK_IN_LIBRARY_SQL = "INSERT INTO book_entity (id, book_id, book_type, book_state, available_at_branch,on_hold_at_branch, on_hold_by_patron, collected_at_branch, collected_by_patron, on_hold_till, version) VALUES (book_entity_seq.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
     private static final String UPDATE_AVAILABLE_BOOK_SQL = "UPDATE book_entity b SET b.book_state = ?, b.available_at_branch = ?, b.version = ? WHERE book_id = ? AND version = ?";
     private static final String UPDATE_BOOK_ON_HOLD_SQL = "UPDATE book_entity b SET b.book_state = ?, b.on_hold_at_branch = ?, b.on_hold_by_patron = ?, b.on_hold_till = ?, b.version = ? WHERE book_id = ? AND version = ?";

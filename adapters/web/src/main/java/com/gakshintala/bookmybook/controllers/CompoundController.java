@@ -8,6 +8,7 @@ import com.gakshintala.bookmybook.restexchange.patron.response.PatronEventRespon
 import com.gakshintala.bookmybook.usecases.compound.AddBookEverywhere;
 import com.gakshintala.bookmybook.usecases.compound.PlaceBookOnHoldCompound;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class CompoundController {
     private final AddBookEverywhere addBookEverywhere;
     private final PlaceBookOnHoldCompound placeBookOnHoldCompound;
 
+    @Async
     @PostMapping("/add-book-everywhere")
     public CompletableFuture<AddBookToLibraryResponse> addBookEverywhere(@Valid @RequestBody AddBookEverywhereRequest addBookEverywhereRequest) {
         return UseCaseExecutor.execute(
@@ -32,6 +34,7 @@ public class CompoundController {
         );
     }
 
+    @Async
     @PostMapping("/place-on-hold")
     public CompletableFuture<PatronEventResponse> placeOnHoldCompound(@Valid @RequestBody PlaceBookOnHoldCompoundRequest placeBookOnHoldCompoundRequest) {
         return UseCaseExecutor.execute(

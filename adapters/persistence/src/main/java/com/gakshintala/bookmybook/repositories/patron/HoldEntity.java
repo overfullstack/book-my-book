@@ -14,8 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Table("hold_entity")
 public class HoldEntity {
-    private UUID bookId;
     private UUID patronId;
+    private UUID bookId;
     private UUID libraryBranchId;
     private Instant till;
 

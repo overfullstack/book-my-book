@@ -15,6 +15,7 @@ import com.gakshintala.bookmybook.usecases.patron.PatronCancelBookOnHold;
 import com.gakshintala.bookmybook.usecases.patron.PatronCollectBookOnHold;
 import com.gakshintala.bookmybook.usecases.patron.PatronPlaceBookOnHold;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class PatronController {
     private final PatronCancelBookOnHold patronCancelBookOnHold;
     private final PlaceBookOnHoldCompound placeBookOnHoldCompound;
 
+    @Async
     @PostMapping("/create")
     public CompletableFuture<PatronResponse> createPatron(@Valid @RequestBody CreatePatronRequest createPatronRequest) {
         return UseCaseExecutor.execute(
@@ -42,6 +44,7 @@ public class PatronController {
         );
     }
 
+    @Async
     @PostMapping("/place-on-hold")
     public CompletableFuture<PatronEventResponse> placeOnHold(@Valid @RequestBody PlaceBookOnHoldRequest placeBookOnHoldRequest) {
         return UseCaseExecutor.execute(
@@ -51,6 +54,7 @@ public class PatronController {
         );
     }
 
+    @Async
     @PostMapping("/collect")
     public CompletableFuture<PatronEventResponse> collectOnHold(@Valid @RequestBody CollectBookOnHoldRequest collectBookOnHoldRequest) {
         return UseCaseExecutor.execute(
@@ -60,6 +64,7 @@ public class PatronController {
         );
     }
 
+    @Async
     @PostMapping("/cancel")
     public CompletableFuture<PatronEventResponse> cancelOnHold(@Valid @RequestBody CancelHoldRequest cancelHoldRequest) {
         return UseCaseExecutor.execute(
@@ -69,6 +74,7 @@ public class PatronController {
         );
     }
 
+    @Async
     @PostMapping("/compound-place-on-hold")
     public CompletableFuture<PatronEventResponse> placeOnHoldCompound(@Valid @RequestBody PlaceBookOnHoldCompoundRequest placeBookOnHoldCompoundRequest) {
         return UseCaseExecutor.execute(

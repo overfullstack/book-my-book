@@ -10,11 +10,12 @@ import java.util.function.Function;
 @UtilityClass
 public class UseCaseExecutor {
     public static <ResponseT, I, O extends Try> CompletableFuture<ResponseT> execute(
-            UseCase<I, O> useCase, I input,
+            UseCase<I, O> useCase,
+            I input,
             Function<O, ResponseT> outputMapper) {
         return CompletableFuture
                 .supplyAsync(() -> input)
-                .thenApplyAsync(useCase::execute)
-                .thenApplyAsync(outputMapper);
+                .thenApply(useCase::execute)
+                .thenApply(outputMapper);
     }
 }

@@ -1,6 +1,5 @@
 package com.gakshintala.bookmybook.repositories.patron;
 
-import com.gakshintala.bookmybook.domain.patron.PatronInformation;
 import com.gakshintala.bookmybook.ports.persistence.patron.FindPatron;
 import com.gakshintala.bookmybook.ports.persistence.patron.PersistPatron;
 import org.junit.jupiter.api.Assertions;
@@ -19,10 +18,10 @@ class PatronRepositoryTest {
     FindPatron findPatron;
     @Autowired
     PersistPatron persistPatron;
-
+    
     @Test
     void persist() {
-        PatronInformation patronInformation = regularPatron().getPatronInformation();
+        var patronInformation = regularPatron().getPatronInformation();
         persistPatron.persist(patronInformation);
         final var foundPatron = findPatron.findBy(patronInformation.getPatronId());
         Assertions.assertEquals(foundPatron.get().getPatronInformation().getType(), patronInformation.getType());
