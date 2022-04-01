@@ -7,7 +7,7 @@ dependencies {
     implementation project(':common')
     implementation project(':core')
 
-    implementation group: 'io.vavr', name: 'vavr', version: '0.10.2'
+    implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
     implementation "org.springframework.boot:spring-boot-starter-web"
 
     runtimeOnly "org.springframework.boot:spring-boot-devtools"

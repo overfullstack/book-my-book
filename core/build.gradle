@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation project(':common')
     
-    implementation group: 'io.vavr', name: 'vavr', version: '0.10.2'
+    implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.10.0'
     implementation group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
 
