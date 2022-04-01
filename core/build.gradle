@@ -6,7 +6,7 @@ dependencies {
     implementation project(':common')
     
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.10.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.2'
     implementation group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
