@@ -16,7 +16,7 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
     
     testImplementation 'org.mockito:mockito-junit-jupiter:3.1.0'
-    testImplementation 'com.tngtech.archunit:archunit:0.9.3'
+    testImplementation 'com.tngtech.archunit:archunit:0.23.1'
     testImplementation 'de.adesso:junit-insights:1.1.0'
     testImplementation project(':test-fixtures')
 
