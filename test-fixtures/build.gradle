@@ -2,7 +2,7 @@ dependencies {
     implementation project(':core')
     implementation project(':adapters:web')
     
-    implementation group: 'io.vavr', name: 'vavr', version: '0.10.2'
+    implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
 
 }
