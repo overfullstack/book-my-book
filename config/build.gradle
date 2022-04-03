@@ -1,6 +1,6 @@
 plugins {
     id "org.springframework.boot" version "2.2.0.RELEASE"
-    id "io.freefair.lombok" version "5.3.3.3"
+    id "io.freefair.lombok" version "6.4.1"
 }
 
 dependencies {
@@ -15,7 +15,7 @@ dependencies {
     }
     implementation("io.vavr:vavr-jackson:0.10.3")
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.1.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.4.0'
     testImplementation 'com.tngtech.archunit:archunit:0.9.3'
     testImplementation 'de.adesso:junit-insights:1.1.0'
 
