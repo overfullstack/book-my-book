@@ -1,22 +1,22 @@
 plugins {
-    id "io.freefair.lombok" version "6.4.1"
+    id "io.freefair.lombok" version "6.4.3"
 }
 
 dependencies {
     implementation project(':common')
     
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.10.0'
-    implementation group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.3'
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.2.20.RELEASE'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit'
         exclude group: 'org.junit.vintage'
     }
-    testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
+    testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
     
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.4.0'
-    testImplementation 'com.tngtech.archunit:archunit:0.9.3'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.5.1'
+    testImplementation 'com.tngtech.archunit:archunit:0.23.1'
     testImplementation 'de.adesso:junit-insights:1.1.0'
     testImplementation project(':test-fixtures')
 
