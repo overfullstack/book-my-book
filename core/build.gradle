@@ -7,7 +7,7 @@ dependencies {
     
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.3'
-    implementation group: 'org.springframework', name: 'spring-context', version: '5.2.20.RELEASE'
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.20'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit'
