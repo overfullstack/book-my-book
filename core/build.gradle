@@ -1,28 +1,28 @@
 plugins {
-    id "io.freefair.lombok" version "6.4.3"
+    id "io.freefair.lombok" version "6.6.1"
 }
 
 dependencies {
     implementation project(':common')
     
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.4'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.3'
-    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.20'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.14.1'
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.24'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit'
         exclude group: 'org.junit.vintage'
     }
-    testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
+    testImplementation('org.junit.jupiter:junit-jupiter:5.9.1')
     
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.6.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.10.0'
     testImplementation 'com.tngtech.archunit:archunit:0.23.1'
     testImplementation 'de.adesso:junit-insights:1.1.0'
     testImplementation project(':test-fixtures')
 
     testImplementation "org.codehaus.groovy:groovy"
-    testImplementation "org.spockframework:spock-spring:2.1-groovy-3.0"
-    testImplementation "org.spockframework:spock-core:2.1-groovy-3.0"
+    testImplementation "org.spockframework:spock-spring:2.3-groovy-4.0"
+    testImplementation "org.spockframework:spock-core:2.3-groovy-4.0"
 }
 
 test {
