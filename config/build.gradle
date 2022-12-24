@@ -1,5 +1,5 @@
 plugins {
-    id "org.springframework.boot" version "2.7.0"
+    id "org.springframework.boot" version "3.0.1"
     id "io.freefair.lombok" version "6.4.3"
 }
 
@@ -16,7 +16,7 @@ dependencies {
     implementation("io.vavr:vavr-jackson:0.10.3")
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.mockito:mockito-junit-jupiter:4.6.0'
-    testImplementation 'com.tngtech.archunit:archunit:0.23.1'
+    testImplementation 'com.tngtech.archunit:archunit:1.0.1'
     testImplementation 'de.adesso:junit-insights:1.1.0'
 
     testImplementation project(':test-fixtures')
