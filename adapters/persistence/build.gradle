@@ -1,6 +1,6 @@
 plugins {
     id "io.freefair.lombok" version "6.4.3"
-    id "org.flywaydb.flyway" version "8.5.11"
+    id "org.flywaydb.flyway" version "9.10.2"
 }
 
 dependencies {
@@ -20,7 +20,7 @@ dependencies {
 
     testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
     testImplementation 'org.mockito:mockito-junit-jupiter:4.6.0'
-    testImplementation 'com.tngtech.archunit:archunit:0.23.1'
+    testImplementation 'com.tngtech.archunit:archunit:1.0.1'
     testImplementation 'de.adesso:junit-insights:1.1.0'
     testImplementation project(':test-fixtures')
 }
